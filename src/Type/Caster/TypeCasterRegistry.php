@@ -37,10 +37,10 @@ class TypeCasterRegistry
     {
         $defaultCasters = [
             'array' => new ArrayCaster(),
+            'json' => new JsonCaster(),
             'null' => new NullCaster(),
             'boolean' => new BooleanCaster(),
             'integer' => new IntegerCaster(),
-            'json' => new JsonCaster(),
             'float' => new FloatCaster(),
             'string' => new StringCaster(),
         ];

@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Detector;
 
+use KaririCode\Dotenv\Type\Detector\Trait\ArrayParserTrait;
+use KaririCode\Dotenv\Type\Detector\Trait\StringValidatorTrait;
+
 class ArrayDetector extends AbstractTypeDetector
 {
+    use StringValidatorTrait;
+    use ArrayParserTrait;
+
     public const PRIORITY = 100;
 
     public function detect(mixed $value): ?string
     {
-        if (!is_string($value)) {
+        if (!$this->isStringInput($value)) {
             return null;
         }
-        $trimmed = trim($value);
-        if (str_starts_with($trimmed, '[') && str_ends_with($trimmed, ']')) {
-            $items = str_getcsv(substr($trimmed, 1, -1));
-            foreach ($items as $item) {
-                if ($this->containsNestedStructure(trim($item))) {
-                    return null;
-                }
-            }
 
+        $cleanValue = $this->removeWhitespace($value);
+
+        if ($this->isArrayFormat($cleanValue)) {
             return 'array';
         }
 
         return null;
     }
 
-    private function containsNestedStructure(string $item): bool
+    private function isArrayFormat(string $value): bool
     {
-        return (str_starts_with($item, '{') && str_ends_with($item, '}'))
-               || (str_starts_with($item, '[') && str_ends_with($item, ']'));
+        return $this->hasDelimiters($value, '[', ']');
     }
 }

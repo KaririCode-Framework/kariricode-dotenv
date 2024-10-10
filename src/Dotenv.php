@@ -9,7 +9,6 @@ use KaririCode\Dotenv\Contract\Loader;
 use KaririCode\Dotenv\Contract\Parser;
 use KaririCode\Dotenv\Contract\TypeCaster;
 use KaririCode\Dotenv\Contract\TypeDetector;
-use KaririCode\Dotenv\Exception\DotenvException;
 use KaririCode\Dotenv\Type\TypeSystem;
 
 class Dotenv implements DotenvContract
@@ -48,10 +47,6 @@ class Dotenv implements DotenvContract
 
     private function setEnvironmentVariable(string $key, mixed $value): void
     {
-        // if (!putenv("$key=$value")) {
-        //     throw new DotenvException("Unable to set environment variable: $key");
-        // }
-
         $_ENV[$key] = $value;
         $_SERVER[$key] = $value;
     }

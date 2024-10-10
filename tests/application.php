@@ -8,24 +8,6 @@ use function KaririCode\Dotenv\env;
 
 use KaririCode\Dotenv\Exception\DotenvException;
 
-function testEnvVariable(string $key, string $expectedType): void
-{
-    $value = env($key);
-    $actualType = gettype($value);
-
-    echo sprintf(
-        "%s: %s (Expected: %s, Actual: %s)\n",
-        $key,
-        is_array($value) || is_object($value) ? json_encode($value) : var_export($value, true),
-        $expectedType,
-        $actualType
-    );
-
-    if ($actualType !== $expectedType) {
-        echo "WARNING: Type mismatch for $key\n";
-    }
-}
-
 try {
     $dotenv = DotenvFactory::create(__DIR__ . '/../.env');
     $dotenv->load();
@@ -53,8 +35,8 @@ try {
         'KARIRI_MAIL_ENCRYPTION' => 'NULL',
         'KARIRI_MAIL_FROM_ADDRESS' => 'NULL',
         'KARIRI_MAIL_FROM_NAME' => 'string',
-        'KARIRI_JSON_CONFIG' => 'string',
         'KARIRI_ARRAY_CONFIG' => 'array',
+        'KARIRI_JSON_CONFIG' => 'json',
     ];
 
     foreach ($variables as $key => $expectedType) {
@@ -67,19 +49,24 @@ try {
     echo $appName === $mailFromName
         ? "Variable interpolation for KARIRI_MAIL_FROM_NAME works correctly.\n"
         : "WARNING: Variable interpolation for KARIRI_MAIL_FROM_NAME failed.\n";
-
-    // Test JSON parsing
-    $jsonConfig = env('KARIRI_JSON_CONFIG');
-    $decodedJson = json_decode($jsonConfig, true);
-    echo $decodedJson && isset($decodedJson['nested']['subkey']) && 'subvalue' === $decodedJson['nested']['subkey']
-        ? "JSON parsing works correctly.\n"
-        : "WARNING: JSON parsing failed.\n";
-
-    // Test array parsing
-    $arrayConfig = env('KARIRI_ARRAY_CONFIG');
-    echo is_array($arrayConfig) && 3 === count($arrayConfig) && 'item with spaces' === $arrayConfig[2]
-        ? "Array parsing works correctly.\n"
-        : "WARNING: Array parsing failed.\n";
 } catch (DotenvException $e) {
     echo 'An error occurred: ' . $e->getMessage() . "\n";
+}
+
+function testEnvVariable(string $key, string $expectedType): void
+{
+    $value = env($key);
+    $actualType = gettype($value);
+
+    echo sprintf(
+        "%s: %s (Expected: %s, Actual: %s)\n",
+        $key,
+        is_array($value) || is_object($value) ? json_encode($value) : var_export($value, true),
+        $expectedType,
+        $actualType
+    );
+
+    if ($actualType !== $expectedType) {
+        echo "WARNING: Type mismatch for $key\n";
+    }
 }
