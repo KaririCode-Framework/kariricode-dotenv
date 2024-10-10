@@ -4,8 +4,145 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8646419b444a27dfebdaf5deadcfc776",
-    "packages": [],
+    "content-hash": "ac88ff6156fd02e4b855fd84934f350c",
+    "packages": [
+        {
+            "name": "kariricode/contract",
+            "version": "v2.6.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KaririCode-Framework/kariricode-contract.git",
+                "reference": "5d98b009c7c5c20dd63b4440405ac81f93544e7d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-contract/zipball/5d98b009c7c5c20dd63b4440405ac81f93544e7d",
+                "reference": "5d98b009c7c5c20dd63b4440405ac81f93544e7d",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "enlightn/security-checker": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.58",
+                "mockery/mockery": "^1.6",
+                "nunomaduro/phpinsights": "^2.11",
+                "phpunit/phpunit": "^10.5",
+                "squizlabs/php_codesniffer": "^3.10"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "KaririCode\\Contract\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Walmir Silva",
+                    "email": "walmir.silva@kariricode.org"
+                }
+            ],
+            "description": "Central repository for interface definitions in the KaririCode Framework. Implements interface code in PHP for specified namespaces, adhering to PSR standards and leveraging modern PHP features.",
+            "homepage": "https://kariricode.org/",
+            "keywords": [
+                "PSRs",
+                "contract",
+                "framework",
+                "interface",
+                "kariri",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/KaririCode-Framework/kariricode-contract/issues",
+                "source": "https://github.com/KaririCode-Framework/kariricode-contract"
+            },
+            "time": "2024-10-10T21:05:49+00:00"
+        },
+        {
+            "name": "kariricode/data-structure",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KaririCode-Framework/kariricode-data-structure.git",
+                "reference": "91c9e7ef36143b5e3d449f1a132169580945a4c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KaririCode-Framework/kariricode-data-structure/zipball/91c9e7ef36143b5e3d449f1a132169580945a4c8",
+                "reference": "91c9e7ef36143b5e3d449f1a132169580945a4c8",
+                "shasum": ""
+            },
+            "require": {
+                "kariricode/contract": "^2.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "enlightn/security-checker": "^2.0",
+                "friendsofphp/php-cs-fixer": "^3.58",
+                "mockery/mockery": "^1.6",
+                "nunomaduro/phpinsights": "^2.11",
+                "phpunit/phpunit": "^10.5",
+                "squizlabs/php_codesniffer": "^3.10"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "KaririCode\\DataStructure\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Walmir Silva",
+                    "email": "walmir.silva@kariricode.org"
+                }
+            ],
+            "description": "The KaririCode DataStructure component offers advanced PHP data structures, including lists, stacks, queues, maps, and sets. It features efficient, strongly-typed, object-oriented implementations like ArrayList, LinkedList, BinaryHeap, and TreeMap.",
+            "homepage": "https://kariricode.org/",
+            "keywords": [
+                "KaririCode",
+                "LinkedList",
+                "OOP",
+                "algorithms",
+                "arraylist",
+                "binary heap",
+                "collections",
+                "data structures",
+                "dynamic array",
+                "heap",
+                "php",
+                "queue",
+                "red-black tree",
+                "set",
+                "stack",
+                "strong typing",
+                "treemap"
+            ],
+            "support": {
+                "issues": "https://github.com/KaririCode-Framework/kariricode-data-structure/issues",
+                "source": "https://github.com/KaririCode-Framework/kariricode-data-structure"
+            },
+            "time": "2024-10-10T22:37:23+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "clue/ndjson-react",
@@ -4910,12 +5047,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

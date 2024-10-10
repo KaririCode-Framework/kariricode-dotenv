@@ -22,16 +22,20 @@
     }
   ],
   "require": {
-    "php": "^8.3"
+    "php": "^8.3",
+    "kariricode/data-structure": "^1.0"
   },
   "autoload": {
     "psr-4": {
-      "KaririCode\\Cache\\": "src"
-    }
+      "KaririCode\\Dotenv\\": "src"
+    },
+    "files": [
+      "src/functions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
-      "KaririCode\\Cache\\Tests\\": "tests"
+      "KaririCode\\Dotenv\\Tests\\": "tests"
     }
   },
   "require-dev": {
