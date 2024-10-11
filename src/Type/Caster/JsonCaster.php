@@ -2,28 +2,40 @@
 
 declare(strict_types=1);
 
-declare(strict_types=1);
-
 namespace KaririCode\Dotenv\Type\Caster;
 
 use KaririCode\Dotenv\Contract\TypeCaster;
 
 class JsonCaster implements TypeCaster
 {
-    public function canCast(mixed $value): bool
-    {
-        if (!is_string($value)) {
-            return false;
-        }
-
-        $trimmed = trim($value);
-
-        return (str_starts_with($trimmed, '{') && str_ends_with($trimmed, '}'))
-               || (str_starts_with($trimmed, '[') && str_ends_with($trimmed, ']'));
-    }
-
+    /**
+     * @throws \JsonException
+     */
     public function cast(mixed $value): mixed
     {
-        return json_encode($value);
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        $trimmedValue = $this->removeSurroundingQuotes($value);
+
+        return $this->decodeJson($trimmedValue);
+    }
+
+    private function removeSurroundingQuotes(string $value): string
+    {
+        return trim($value, '"\'');
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    private function decodeJson(string $json): mixed
+    {
+        try {
+            return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            return $json;
+        }
     }
 }

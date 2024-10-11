@@ -56,17 +56,32 @@ try {
 function testEnvVariable(string $key, string $expectedType): void
 {
     $value = env($key);
-    $actualType = gettype($value);
+    $actualType = determineActualType($value, $expectedType);
 
-    echo sprintf(
-        "%s: %s (Expected: %s, Actual: %s)\n",
-        $key,
-        is_array($value) || is_object($value) ? json_encode($value) : var_export($value, true),
-        $expectedType,
-        $actualType
-    );
+    outputTestResult($key, $value, $expectedType, $actualType);
 
     if ($actualType !== $expectedType) {
         echo "WARNING: Type mismatch for $key\n";
     }
+}
+
+function determineActualType(mixed $value, string $expectedType): string
+{
+    if ('json' === $expectedType && (is_array($value) || is_object($value))) {
+        return 'json';
+    }
+
+    return gettype($value);
+}
+
+function outputTestResult(string $key, mixed $value, string $expectedType, string $actualType): void
+{
+    $displayValue = is_array($value) || is_object($value) ? json_encode($value) : var_export($value, true);
+    echo sprintf(
+        "%s: %s (Expected: %s, Actual: %s)\n",
+        $key,
+        $displayValue,
+        $expectedType,
+        $actualType
+    );
 }
