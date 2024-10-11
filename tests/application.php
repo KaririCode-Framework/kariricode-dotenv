@@ -15,7 +15,7 @@ try {
     $variables = [
         'KARIRI_APP_ENV' => 'string',
         'KARIRI_APP_NAME' => 'string',
-        'KARIRI_PHP_VERSION' => 'string',
+        'KARIRI_PHP_VERSION' => 'double',
         'KARIRI_PHP_PORT' => 'integer',
         'KARIRI_APP_DEBUG' => 'boolean',
         'KARIRI_APP_URL' => 'string',

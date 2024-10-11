@@ -13,6 +13,8 @@ class DefaultParser implements Parser
     private const SETTER_CHAR = '=';
     private const INVALID_NAME_CHARS = '{}()[]';
 
+    private array $parsedValues = [];
+
     public function __construct(
         private readonly bool $strictMode = false
     ) {
@@ -21,15 +23,19 @@ class DefaultParser implements Parser
     public function parse(string $content): array
     {
         $lines = $this->splitLines($content);
-
-        return array_reduce($lines, function (array $output, string $line) {
+        foreach ($lines as $line) {
             if ($this->isValidSetter($line)) {
                 [$key, $value] = $this->parseEnvironmentVariable($line);
-                $output[$key] = $value;
+                $this->parsedValues[$key] = $value;
             }
+        }
 
-            return $output;
-        }, []);
+        // Perform interpolation after all variables are parsed
+        foreach ($this->parsedValues as $key => $value) {
+            $this->parsedValues[$key] = $this->interpolateValue($value);
+        }
+
+        return $this->parsedValues;
     }
 
     private function splitLines(string $content): array
@@ -58,7 +64,7 @@ class DefaultParser implements Parser
     {
         [$name, $value] = explode(self::SETTER_CHAR, $line, 2);
         $name = trim($name);
-        $value = $this->interpolateValue(trim($value));
+        $value = trim($value);
 
         $this->validateVariableName($name);
 
@@ -67,11 +73,13 @@ class DefaultParser implements Parser
 
     private function validateVariableName(string $name): void
     {
-        match (true) {
-            '' === $name => throw new InvalidValueException('Empty variable name'),
-            $this->strictMode && $this->containsInvalidCharacters($name) => throw new InvalidValueException('Invalid character in variable name'),
-            default => null,
-        };
+        if ('' === $name) {
+            throw new InvalidValueException('Empty variable name');
+        }
+
+        if ($this->strictMode && $this->containsInvalidCharacters($name)) {
+            throw new InvalidValueException('Invalid character in variable name');
+        }
     }
 
     private function containsInvalidCharacters(string $name): bool
@@ -81,10 +89,10 @@ class DefaultParser implements Parser
 
     private function interpolateValue(string $value): string
     {
-        return preg_replace_callback(
-            '/\$\{([A-Z0-9_]+)\}/',
-            fn ($matches) => $_ENV[$matches[1]] ?? $matches[0],
-            $value
-        );
+        return preg_replace_callback('/\${([A-Z0-9_]+)}/', function ($matches) {
+            $varName = $matches[1];
+
+            return $this->parsedValues[$varName] ?? $matches[0];
+        }, $value);
     }
 }
