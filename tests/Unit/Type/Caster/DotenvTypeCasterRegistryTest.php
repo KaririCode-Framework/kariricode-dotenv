@@ -9,7 +9,7 @@ use KaririCode\Dotenv\Contract\Type\TypeCasterRegistry;
 use KaririCode\Dotenv\Type\Caster\DotenvTypeCasterRegistry;
 use PHPUnit\Framework\TestCase;
 
-final class TypeCasterRegistryTest extends TestCase
+final class DotenvTypeCasterRegistryTest extends TestCase
 {
     private TypeCasterRegistry $registry;
 
@@ -39,6 +39,23 @@ final class TypeCasterRegistryTest extends TestCase
         $this->expectExceptionMessage('Key not found: unregistered_type');
 
         $this->registry->cast('unregistered_type', 'input');
+    }
+
+    public function testCastWithVariousTypes(): void
+    {
+        $testCases = [
+            'registered_type' => ['string', 42, '42'],
+            'null_type' => ['null', 'null', null],
+        ];
+
+        foreach ($testCases as $type => [$castType, $input, $expected]) {
+            $result = $this->registry->cast($castType, $input);
+            $this->assertEquals($expected, $result, "Casting '{$input}' as '{$castType}' should return '{$expected}'");
+        }
+
+        // Test for unregistered type
+        $this->expectException(\OutOfRangeException::class);
+        $this->registry->cast('unregistered', 'value');
     }
 
     public function testDefaultCasters(): void
