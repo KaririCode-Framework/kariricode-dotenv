@@ -66,13 +66,12 @@ final class DotenvTypeDetectorRegistryTest extends TestCase
         $this->assertSame('string', $result, "Should fallback to 'string' when no detector matches");
     }
 
-
     public function testFallbackToStringForUnrecognizedTypes(): void
     {
         // Remove all default detectors
         $reflectionProperty = new \ReflectionProperty(DotenvTypeDetectorRegistry::class, 'detectors');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->registry, new \KaririCode\DataStructure\Collection\ArrayList());
+        $reflectionProperty->setValue($this->registry, new ArrayList());
 
         $unrecognizedValues = [
             'complex_value' => new \stdClass(),
