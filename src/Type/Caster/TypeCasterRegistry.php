@@ -25,7 +25,6 @@ class TypeCasterRegistry
     public function cast(string $type, mixed $value): mixed
     {
         $caster = $this->casters->get($type);
-
         if ($caster instanceof TypeCaster) {
             return $caster->cast($value);
         }

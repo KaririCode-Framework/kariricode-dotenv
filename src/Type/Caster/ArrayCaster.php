@@ -12,6 +12,9 @@ class ArrayCaster implements TypeCaster
     {
         if (is_string($value)) {
             $trimmed = trim($value, "[] \t\n\r\0\x0B");
+            if ('' === $trimmed) {
+                return [];
+            }
             $items = explode(',', $trimmed);
 
             return array_map(fn ($item) => trim($item, " \t\n\r\0\x0B\"'"), $items);

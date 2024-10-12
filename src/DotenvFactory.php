@@ -6,12 +6,13 @@ namespace KaririCode\Dotenv;
 
 use KaririCode\Dotenv\Loader\FileLoader;
 use KaririCode\Dotenv\Parser\DefaultParser;
+use KaririCode\Dotenv\Parser\StrictParser;
 
 class DotenvFactory
 {
     public static function create(string $path, bool $strict = false): Dotenv
     {
-        $parser = new DefaultParser($strict);
+        $parser = $strict ? new StrictParser() : new DefaultParser();
         $loader = new FileLoader($path);
 
         return new Dotenv($parser, $loader);

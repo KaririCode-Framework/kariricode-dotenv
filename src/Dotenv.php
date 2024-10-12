@@ -25,15 +25,17 @@ class Dotenv implements DotenvContract
         $content = $this->loader->load();
         $parsed = $this->parser->parse($content);
 
-        foreach ($parsed as $key => $value) {
-            $processedValue = $this->typeSystem->processValue($value);
-            $this->setEnvironmentVariable($key, $processedValue);
+        if (!empty($parsed)) {
+            foreach ($parsed as $key => $value) {
+                $processedValue = $this->typeSystem->processValue($value);
+                $this->setEnvironmentVariable($key, $processedValue);
+            }
         }
     }
 
-    public function addTypeDetector(TypeDetector $caster): self
+    public function addTypeDetector(TypeDetector $detector): self
     {
-        $this->typeSystem->registerDetector($caster);
+        $this->typeSystem->registerDetector($detector);
 
         return $this;
     }
