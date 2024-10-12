@@ -104,7 +104,7 @@ final class DotenvTypeCasterRegistryTest extends TestCase
         $input = 'test_value';
         $result = $this->registry->cast('any_type', $input);
 
-        $this->assertSame($input, $result, "Should return original value when get() returns non-TypeCaster");
+        $this->assertSame($input, $result, 'Should return original value when get() returns non-TypeCaster');
     }
 
     public function testFallbackWhenGetReturnsNull(): void
@@ -120,7 +120,7 @@ final class DotenvTypeCasterRegistryTest extends TestCase
         $input = 'test_value';
         $result = $this->registry->cast('any_type', $input);
 
-        $this->assertSame($input, $result, "Should return original value when get() returns null");
+        $this->assertSame($input, $result, 'Should return original value when get() returns null');
     }
 
     public function testRegisterNonTypeCompliantCaster(): void

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
-
 use function KaririCode\Dotenv\env;
+
+use PHPUnit\Framework\TestCase;
 
 final class EnvFunctionTest extends TestCase
 {
