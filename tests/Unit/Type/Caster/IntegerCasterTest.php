@@ -26,7 +26,7 @@ final class IntegerCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function integerValuesProvider(): array
+    public static function integerValuesProvider(): array
     {
         return [
             'positive integer string' => ['42', 42],
@@ -54,7 +54,7 @@ final class IntegerCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function canCastProvider(): array
+    public static function canCastProvider(): array
     {
         return [
             'integer string' => ['42', true],

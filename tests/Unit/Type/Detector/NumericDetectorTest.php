@@ -25,7 +25,7 @@ final class NumericDetectorTest extends TestCase
         $this->assertSame($expected, $this->detector->detect($input));
     }
 
-    public function validNumericProvider(): array
+    public static function validNumericProvider(): array
     {
         return [
             'integer' => [42, 'integer'],
@@ -47,7 +47,7 @@ final class NumericDetectorTest extends TestCase
         $this->assertNull($this->detector->detect($input));
     }
 
-    public function invalidNumericProvider(): array
+    public static function invalidNumericProvider(): array
     {
         return [
             'string' => ['not a number'],

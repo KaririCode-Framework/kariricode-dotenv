@@ -26,7 +26,7 @@ final class StrictParserTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function validInputProvider(): array
+    public static function validInputProvider(): array
     {
         return [
             'simple key-value' => [
@@ -94,7 +94,7 @@ final class StrictParserTest extends TestCase
         $this->parser->parse($input);
     }
 
-    public function invalidCharactersProvider(): array
+    public static function invalidCharactersProvider(): array
     {
         return [
             'with space' => ['INVALID KEY=value'],

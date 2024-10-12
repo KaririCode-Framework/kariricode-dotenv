@@ -26,7 +26,7 @@ final class StringCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function stringValuesProvider(): array
+    public static function stringValuesProvider(): array
     {
         return [
             'simple string' => ['hello', 'hello'],
@@ -60,7 +60,7 @@ final class StringCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function canCastProvider(): array
+    public static function canCastProvider(): array
     {
         return [
             'string' => ['hello', true],

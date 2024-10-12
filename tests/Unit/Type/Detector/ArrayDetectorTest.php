@@ -25,7 +25,7 @@ final class ArrayDetectorTest extends TestCase
         $this->assertSame('array', $this->detector->detect($input));
     }
 
-    public function validArrayProvider(): array
+    public static function validArrayProvider(): array
     {
         return [
             'simple array' => ['[1, 2, 3]'],
@@ -45,7 +45,7 @@ final class ArrayDetectorTest extends TestCase
         $this->assertNull($this->detector->detect($input));
     }
 
-    public function invalidArrayProvider(): array
+    public static function invalidArrayProvider(): array
     {
         return [
             'string' => ['not an array'],

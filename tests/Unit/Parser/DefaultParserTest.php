@@ -25,7 +25,7 @@ final class DefaultParserTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function validInputProvider(): array
+    public static function validInputProvider(): array
     {
         return [
             'simple key-value' => [

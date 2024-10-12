@@ -25,7 +25,7 @@ final class BooleanDetectorTest extends TestCase
         $this->assertSame('boolean', $this->detector->detect($input));
     }
 
-    public function validBooleanProvider(): array
+    public static function validBooleanProvider(): array
     {
         return [
             'true' => [true],
@@ -51,7 +51,7 @@ final class BooleanDetectorTest extends TestCase
         $this->assertNull($this->detector->detect($input));
     }
 
-    public function invalidBooleanProvider(): array
+    public static function invalidBooleanProvider(): array
     {
         return [
             'string' => ['not a boolean'],

@@ -25,7 +25,7 @@ final class JsonDetectorTest extends TestCase
         $this->assertSame('json', $this->detector->detect($input));
     }
 
-    public function validJsonProvider(): array
+    public static function validJsonProvider(): array
     {
         return [
             'simple object' => ['{"key": "value"}'],
@@ -45,7 +45,7 @@ final class JsonDetectorTest extends TestCase
         $this->assertNull($this->detector->detect($input));
     }
 
-    public function invalidJsonProvider(): array
+    public static function invalidJsonProvider(): array
     {
         return [
             'string' => ['not a json'],

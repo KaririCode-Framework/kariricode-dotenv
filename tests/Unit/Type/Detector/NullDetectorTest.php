@@ -25,7 +25,7 @@ final class NullDetectorTest extends TestCase
         $this->assertSame('null', $this->detector->detect($input));
     }
 
-    public function validNullProvider(): array
+    public static function validNullProvider(): array
     {
         return [
             'null value' => [null],
@@ -43,7 +43,7 @@ final class NullDetectorTest extends TestCase
         $this->assertNull($this->detector->detect($input));
     }
 
-    public function invalidNullProvider(): array
+    public static function invalidNullProvider(): array
     {
         return [
             'string' => ['not null'],

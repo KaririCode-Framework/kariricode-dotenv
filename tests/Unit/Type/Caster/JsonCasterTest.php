@@ -26,7 +26,7 @@ final class JsonCasterTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function jsonValuesProvider(): array
+    public static function jsonValuesProvider(): array
     {
         return [
             'simple object' => ['{"key":"value"}', ['key' => 'value']],

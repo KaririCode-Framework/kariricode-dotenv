@@ -25,7 +25,7 @@ final class StringDetectorTest extends TestCase
         $this->assertSame('string', $this->detector->detect($input));
     }
 
-    public function validStringProvider(): array
+    public static function validStringProvider(): array
     {
         return [
             'simple string' => ['hello'],
@@ -44,7 +44,7 @@ final class StringDetectorTest extends TestCase
         $this->assertNull($this->detector->detect($input));
     }
 
-    public function invalidStringProvider(): array
+    public static function invalidStringProvider(): array
     {
         return [
             'integer' => [42],

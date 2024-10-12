@@ -26,7 +26,7 @@ final class NullCasterTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function nullValuesProvider(): array
+    public static function nullValuesProvider(): array
     {
         return [
             'null string' => ['null'],
@@ -45,7 +45,7 @@ final class NullCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function canCastProvider(): array
+    public static function canCastProvider(): array
     {
         return [
             'null string' => ['null', true],

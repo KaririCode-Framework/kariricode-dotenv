@@ -26,7 +26,7 @@ final class FloatCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function floatValuesProvider(): array
+    public static function floatValuesProvider(): array
     {
         return [
             'positive float string' => ['3.14', 3.14],
@@ -56,7 +56,7 @@ final class FloatCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function canCastProvider(): array
+    public static function canCastProvider(): array
     {
         return [
             'float string' => ['3.14', true],

@@ -26,7 +26,7 @@ final class ArrayCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function validArrayStringProvider(): array
+    public static function validArrayStringProvider(): array
     {
         return [
             'simple array' => ['[1, 2, 3]', ['1', '2', '3']],

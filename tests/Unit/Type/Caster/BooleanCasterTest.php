@@ -26,7 +26,7 @@ final class BooleanCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function booleanValuesProvider(): array
+    public static function booleanValuesProvider(): array
     {
         return [
             'true string' => ['true', true],
@@ -64,7 +64,7 @@ final class BooleanCasterTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function canCastProvider(): array
+    public static function canCastProvider(): array
     {
         return [
             'true string' => ['true', true],
