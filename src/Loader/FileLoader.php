@@ -18,11 +18,11 @@ class FileLoader implements Loader
 
     public function load(): string
     {
-        if (!$this->isFileReadable($this->filePath)) {
-            throw new InvalidFileException(sprintf('Unable to read the environment file at %s.', $this->filePath));
+        if (!file_exists($this->filePath)) {
+            throw new InvalidFileException(sprintf('The environment file %s does not exist.', $this->filePath));
         }
 
-        $contents = file_get_contents($this->filePath);
+        $contents = $this->getFileContents($this->filePath);
 
         if (false === $contents) {
             throw new InvalidFileException(sprintf('Unable to read the environment file at %s.', $this->filePath));
@@ -31,8 +31,8 @@ class FileLoader implements Loader
         return $contents;
     }
 
-    private function isFileReadable(string $filePath): bool
+    protected function getFileContents(string $filePath): string|false
     {
-        return is_readable($filePath) && is_file($filePath);
+        return file_get_contents($filePath);
     }
 }
