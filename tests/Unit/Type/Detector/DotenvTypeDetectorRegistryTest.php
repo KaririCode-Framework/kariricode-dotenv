@@ -63,7 +63,27 @@ final class DotenvTypeDetectorRegistryTest extends TestCase
         $this->registry->registerDetector($mockDetector);
 
         $result = $this->registry->detectType('test_value');
-        $this->assertSame('string', $result);
+        $this->assertSame('string', $result, "Should fallback to 'string' when no detector matches");
+    }
+
+
+    public function testFallbackToStringForUnrecognizedTypes(): void
+    {
+        // Remove all default detectors
+        $reflectionProperty = new \ReflectionProperty(DotenvTypeDetectorRegistry::class, 'detectors');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->registry, new \KaririCode\DataStructure\Collection\ArrayList());
+
+        $unrecognizedValues = [
+            'complex_value' => new \stdClass(),
+            'resource' => fopen('php://memory', 'r'),
+            'closure' => function () {},
+        ];
+
+        foreach ($unrecognizedValues as $description => $value) {
+            $result = $this->registry->detectType($value);
+            $this->assertSame('string', $result, "Should fallback to 'string' for $description");
+        }
     }
 
     public function testDefaultDetectors(): void
@@ -81,24 +101,6 @@ final class DotenvTypeDetectorRegistryTest extends TestCase
         foreach ($testCases as $expectedType => $value) {
             $detectedType = $this->registry->detectType($value);
             $this->assertSame($expectedType, $detectedType, "Failed to detect {$expectedType} for value: {$value}");
-        }
-    }
-
-    public function testFallbackToStringForUnrecognizedTypes(): void
-    {
-        $reflectionProperty = new \ReflectionProperty(DotenvTypeDetectorRegistry::class, 'detectors');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->registry, new ArrayList());
-
-        $unrecognizedValues = [
-            'complex_value' => new \stdClass(),
-            'resource' => fopen('php://memory', 'r'),
-            'closure' => function () {},
-        ];
-
-        foreach ($unrecognizedValues as $description => $value) {
-            $result = $this->registry->detectType($value);
-            $this->assertSame('string', $result, "Should fallback to 'string' for $description");
         }
     }
 

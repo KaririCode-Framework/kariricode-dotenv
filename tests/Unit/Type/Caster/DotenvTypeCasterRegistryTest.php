@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Tests\Type\Caster;
 
+use KaririCode\DataStructure\Collection\ArrayList;
 use KaririCode\Dotenv\Contract\Type\TypeCaster;
 use KaririCode\Dotenv\Contract\Type\TypeCasterRegistry;
 use KaririCode\Dotenv\Type\Caster\DotenvTypeCasterRegistry;
@@ -88,6 +89,38 @@ final class DotenvTypeCasterRegistryTest extends TestCase
 
         $result = $this->registry->cast('string', 'input');
         $this->assertSame('custom_casted', $result);
+    }
+
+    public function testFallbackWhenGetReturnsNonTypeCaster(): void
+    {
+        $mockArrayList = $this->createMock(ArrayList::class);
+        $mockArrayList->method('get')
+            ->willReturn(new \stdClass()); // Retorna um objeto que não é TypeCaster
+
+        $reflectionProperty = new \ReflectionProperty(DotenvTypeCasterRegistry::class, 'casters');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->registry, $mockArrayList);
+
+        $input = 'test_value';
+        $result = $this->registry->cast('any_type', $input);
+
+        $this->assertSame($input, $result, "Should return original value when get() returns non-TypeCaster");
+    }
+
+    public function testFallbackWhenGetReturnsNull(): void
+    {
+        $mockArrayList = $this->createMock(ArrayList::class);
+        $mockArrayList->method('get')
+            ->willReturn(null);
+
+        $reflectionProperty = new \ReflectionProperty(DotenvTypeCasterRegistry::class, 'casters');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->registry, $mockArrayList);
+
+        $input = 'test_value';
+        $result = $this->registry->cast('any_type', $input);
+
+        $this->assertSame($input, $result, "Should return original value when get() returns null");
     }
 
     public function testRegisterNonTypeCompliantCaster(): void
