@@ -2,51 +2,79 @@
 
 declare(strict_types=1);
 
-namespace KaririCode\Dotenv\Type\Caster;
+namespace KaririCode\Dotenv\Tests\Type\Caster;
 
-use KaririCode\DataStructure\Collection\ArrayList;
 use KaririCode\Dotenv\Contract\TypeCaster;
+use KaririCode\Dotenv\Type\Caster\TypeCasterRegistry;
+use PHPUnit\Framework\TestCase;
 
-final class TypeCasterRegistry
+final class TypeCasterRegistryTest extends TestCase
 {
-    private ArrayList $casters;
+    private TypeCasterRegistry $registry;
 
-    public function __construct()
+    protected function setUp(): void
     {
-        $this->casters = new ArrayList();
-        $this->registerDefaultCasters();
+        parent::setUp();
+        $this->registry = new TypeCasterRegistry();
     }
 
-    public function register(string $type, TypeCaster $caster): void
+    public function testRegisterAndCast(): void
     {
-        $this->casters->set($type, $caster);
+        $mockCaster = $this->createMock(TypeCaster::class);
+        $mockCaster->expects($this->once())
+            ->method('cast')
+            ->with('input')
+            ->willReturn('casted');
+
+        $this->registry->register('test_type', $mockCaster);
+
+        $result = $this->registry->cast('test_type', 'input');
+        $this->assertSame('casted', $result);
     }
 
-    public function cast(string $type, mixed $value): mixed
+    public function testCastWithUnregisteredType(): void
     {
-        if (!$this->casters->has($type)) {
-            return $value; // Return original value if no caster is registered for the type
-        }
+        $this->expectException(\OutOfRangeException::class);
+        $this->expectExceptionMessage('Key not found: unregistered_type');
 
-        $caster = $this->casters->get($type);
-
-        return $caster->cast($value);
+        $this->registry->cast('unregistered_type', 'input');
     }
 
-    private function registerDefaultCasters(): void
+    public function testDefaultCasters(): void
     {
-        $defaultCasters = [
-            'array' => new ArrayCaster(),
-            'json' => new JsonCaster(),
-            'null' => new NullCaster(),
-            'boolean' => new BooleanCaster(),
-            'integer' => new IntegerCaster(),
-            'float' => new FloatCaster(),
-            'string' => new StringCaster(),
+        $testCases = [
+            'array' => ['[1,2,3]', [1, 2, 3]],
+            'json' => ['{"key":"value"}', ['key' => 'value']],
+            'null' => ['null', null],
+            'boolean' => ['true', true],
+            'integer' => ['42', 42],
+            'float' => ['3.14', 3.14],
+            'string' => [42, '42'],
         ];
 
-        foreach ($defaultCasters as $type => $caster) {
-            $this->register($type, $caster);
+        foreach ($testCases as $type => [$input, $expected]) {
+            $result = $this->registry->cast($type, $input);
+            $this->assertEquals($expected, $result, "Default caster for '{$type}' should modify the input correctly");
         }
+    }
+
+    public function testOverrideDefaultCaster(): void
+    {
+        $mockCaster = $this->createMock(TypeCaster::class);
+        $mockCaster->expects($this->once())
+            ->method('cast')
+            ->with('input')
+            ->willReturn('custom_casted');
+
+        $this->registry->register('string', $mockCaster);
+
+        $result = $this->registry->cast('string', 'input');
+        $this->assertSame('custom_casted', $result);
+    }
+
+    public function testRegisterNonTypeCompliantCaster(): void
+    {
+        $this->expectException(\TypeError::class);
+        $this->registry->register('non_compliant', new \stdClass());
     }
 }
