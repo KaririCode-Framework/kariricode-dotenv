@@ -58,6 +58,37 @@ final class JsonDetectorTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider jsonArrayOfObjectsProvider
+     */
+    public function testIsJsonArrayOfObjects(string $input, bool $expected): void
+    {
+        $reflectionMethod = new \ReflectionMethod(JsonDetector::class, 'isJsonArrayOfObjects');
+        $reflectionMethod->setAccessible(true);
+
+        $this->assertSame($expected, $reflectionMethod->invoke($this->detector, $input));
+    }
+
+    public static function jsonArrayOfObjectsProvider(): array
+    {
+        return [
+            'valid array of objects' => ['[{"id": 1}, {"id": 2}]', true],
+            'empty array' => ['[]', true],
+            'array with single object' => ['[{"id": 1}]', true],
+            'array of mixed types' => ['[{"id": 1}, 2, "string"]', false],
+            'array of arrays' => ['[[1, 2], [3, 4]]', false],
+            'simple array' => ['[1, 2, 3]', false],
+            'object, not array' => ['{"key": "value"}', false],
+            'invalid json' => ['not json', false],
+            'malformed json array' => ['[{"id": 1}, {"id": 2]', false],
+            'json number' => ['42', false],
+            'json string' => ['"string"', false],
+            'json true' => ['true', false],
+            'json false' => ['false', false],
+            'json null' => ['null', false],
+        ];
+    }
+
     public function testGetPriority(): void
     {
         $this->assertSame(90, $this->detector->getPriority());
