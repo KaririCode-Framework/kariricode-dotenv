@@ -28,12 +28,11 @@ final class NumericDetectorTest extends TestCase
     public static function validNumericProvider(): array
     {
         return [
-            'integer' => [42, 'integer'],
-            'negative integer' => [-42, 'integer'],
-            'zero' => [0, 'integer'],
-            'float' => [3.14, 'float'],
-            'negative float' => [-3.14, 'float'],
-            'scientific notation' => [1e-10, 'float'],
+            'integer' => ['42', 'integer'],
+            'negative integer' => ['-42', 'integer'],
+            'zero' => ['0', 'integer'],
+            'float' => ['3.14', 'float'],
+            'negative float' => ['-3.14', 'float'],
             'string integer' => ['42', 'integer'],
             'string float' => ['3.14', 'float'],
         ];

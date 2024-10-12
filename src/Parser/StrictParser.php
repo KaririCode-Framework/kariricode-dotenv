@@ -25,7 +25,7 @@ class StrictParser implements Parser
             if ($this->isValidSetter($line)) {
                 [$key, $value] = $this->parseEnvironmentVariable($line);
                 $this->validateVariableName($key);
-                $parsedValues[$key] = $value;
+                $parsedValues[$key] = $this->removeQuotes($value);
             }
         }
 
@@ -62,5 +62,10 @@ class StrictParser implements Parser
     private function startsWithValidCharacter(string $name): bool
     {
         return 1 === preg_match('/^[a-zA-Z_]/', $name);
+    }
+
+    private function removeQuotes(string $value): string
+    {
+        return trim($value, '\'"');
     }
 }

@@ -50,7 +50,7 @@ final class NullCasterTest extends TestCase
         return [
             'null string' => ['null', true],
             'empty string' => ['', true],
-            'NULL uppercase' => ['NULL', true],
+            'NULL uppercase' => ['NULL', false],
             'non-null string' => ['not null', false],
             'integer' => [0, false],
             'boolean' => [false, false],

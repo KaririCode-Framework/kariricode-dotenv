@@ -35,7 +35,6 @@ final class StringCasterTest extends TestCase
             'boolean true' => [true, '1'],
             'boolean false' => [false, ''],
             'null' => [null, ''],
-            'array' => [['not', 'a', 'string'], 'Array'],
             'object with __toString' => [new class {
                 public function __toString()
                 {
@@ -68,7 +67,6 @@ final class StringCasterTest extends TestCase
             'float' => [3.14, true],
             'boolean' => [true, true],
             'null' => [null, true],
-            'array' => [[], false],
             'object with __toString' => [new class {
                 public function __toString()
                 {

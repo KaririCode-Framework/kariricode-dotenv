@@ -22,7 +22,7 @@ class DefaultParser implements Parser
             if ($this->isValidSetter($line)) {
                 [$key, $value] = $this->parseEnvironmentVariable($line);
                 if (null !== $key && '' !== $key) {
-                    $parsedValues[$key] = $value;
+                    $parsedValues[$key] = $this->removeQuotes($value);
                 }
             }
         }
@@ -38,5 +38,10 @@ class DefaultParser implements Parser
     private function validateVariableName(?string $name): bool
     {
         return null !== $name && '' !== $name;
+    }
+
+    private function removeQuotes(string $value): string
+    {
+        return trim($value, '\'"');
     }
 }

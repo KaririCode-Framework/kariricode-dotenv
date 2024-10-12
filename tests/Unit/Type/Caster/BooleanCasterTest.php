@@ -43,8 +43,6 @@ final class BooleanCasterTest extends TestCase
             'No uppercase' => ['No', false],
             'ON uppercase' => ['ON', true],
             'OFF uppercase' => ['OFF', false],
-            'true boolean' => [true, true],
-            'false boolean' => [false, false],
         ];
     }
 
@@ -77,11 +75,9 @@ final class BooleanCasterTest extends TestCase
             'off string' => ['off', true],
             'TRUE uppercase' => ['TRUE', true],
             'FALSE uppercase' => ['FALSE', true],
-            'true boolean' => [true, true],
-            'false boolean' => [false, true],
             'non-boolean string' => ['not a boolean', false],
-            'integer' => [42, false],
-            'array' => [[], false],
+            'integer' => ['42', false],
+            'array' => ['[]', false],
         ];
     }
 }

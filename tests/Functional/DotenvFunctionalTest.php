@@ -153,10 +153,13 @@ final class DotenvFunctionalTest extends TestCase
         $this->typeSystem->expects($this->never())
             ->method('processValue');
 
+        $initialEnv = $_ENV;
+        $initialServer = $_SERVER;
+
         $this->dotenv->load();
 
-        $this->assertEmpty($_ENV);
-        $this->assertEmpty($_SERVER);
+        $this->assertSame($initialEnv, $_ENV);
+        $this->assertSame($initialServer, $_SERVER);
     }
 
     protected function tearDown(): void

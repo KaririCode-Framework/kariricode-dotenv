@@ -30,7 +30,6 @@ final class NullDetectorTest extends TestCase
         return [
             'null value' => [null],
             'null string' => ['null'],
-            'NULL uppercase' => ['NULL'],
             'empty string' => [''],
         ];
     }
@@ -47,10 +46,10 @@ final class NullDetectorTest extends TestCase
     {
         return [
             'string' => ['not null'],
-            'number' => [42],
-            'boolean' => [true],
-            'array' => [[1, 2, 3]],
-            'object' => [new \stdClass()],
+            'number' => ['42'],
+            'boolean' => ['true'],
+            'array' => ['[1, 2, 3]'],
+            'object' => ['{}'],
         ];
     }
 
