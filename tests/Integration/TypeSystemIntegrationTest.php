@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Tests\Integration;
 
-use KaririCode\Dotenv\Contract\TypeCaster;
-use KaririCode\Dotenv\Contract\TypeDetector;
-use KaririCode\Dotenv\Type\TypeSystem;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeSystem;
+use KaririCode\Dotenv\Type\DotenvTypeSystem;
 use PHPUnit\Framework\TestCase;
 
 class TypeSystemIntegrationTest extends TestCase
@@ -16,7 +17,7 @@ class TypeSystemIntegrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->typeSystem = new TypeSystem();
+        $this->typeSystem = new DotenvTypeSystem();
     }
 
     public function testDefaultTypeDetectionAndCasting(): void

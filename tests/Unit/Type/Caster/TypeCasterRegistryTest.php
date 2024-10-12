@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Tests\Type\Caster;
 
-use KaririCode\Dotenv\Contract\TypeCaster;
-use KaririCode\Dotenv\Type\Caster\TypeCasterRegistry;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeCasterRegistry;
+use KaririCode\Dotenv\Type\Caster\DotenvTypeCasterRegistry;
 use PHPUnit\Framework\TestCase;
 
 final class TypeCasterRegistryTest extends TestCase
@@ -15,7 +16,7 @@ final class TypeCasterRegistryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->registry = new TypeCasterRegistry();
+        $this->registry = new DotenvTypeCasterRegistry();
     }
 
     public function testRegisterAndCast(): void

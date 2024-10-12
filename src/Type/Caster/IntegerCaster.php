@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Caster;
 
-use KaririCode\Dotenv\Contract\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
 
 class IntegerCaster implements TypeCaster
 {

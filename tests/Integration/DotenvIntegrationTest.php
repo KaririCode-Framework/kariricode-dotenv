@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Tests\Integration;
 
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
 use KaririCode\Dotenv\DotenvFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -57,7 +59,7 @@ EOT;
 
         $dotenv = DotenvFactory::create($this->envFile);
 
-        $customDetector = new class implements \KaririCode\Dotenv\Contract\TypeDetector {
+        $customDetector = new class implements TypeDetector {
             public function detect(mixed $value): ?string
             {
                 return 'custom_value' === $value ? 'custom' : null;
@@ -69,7 +71,7 @@ EOT;
             }
         };
 
-        $customCaster = new class implements \KaririCode\Dotenv\Contract\TypeCaster {
+        $customCaster = new class implements TypeCaster {
             public function cast(mixed $value): string
             {
                 return strtoupper((string) $value);

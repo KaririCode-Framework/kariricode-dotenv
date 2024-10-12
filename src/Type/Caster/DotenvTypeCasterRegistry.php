@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace KaririCode\Dotenv\Type\Caster;
 
 use KaririCode\DataStructure\Collection\ArrayList;
-use KaririCode\Dotenv\Contract\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeCasterRegistry;
 
-class TypeCasterRegistry
+class DotenvTypeCasterRegistry implements TypeCasterRegistry
 {
     private ArrayList $casters;
 

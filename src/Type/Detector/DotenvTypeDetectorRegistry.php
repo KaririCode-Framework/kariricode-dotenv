@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace KaririCode\Dotenv\Type\Detector;
 
 use KaririCode\DataStructure\Collection\ArrayList;
-use KaririCode\Dotenv\Contract\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeDetectorRegistry;
 
-class TypeDetectorRegistry
+class DotenvTypeDetectorRegistry implements TypeDetectorRegistry
 {
     public function __construct(
         private $detectors = new ArrayList()

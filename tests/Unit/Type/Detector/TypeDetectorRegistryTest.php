@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Tests\Unit\Type\Detector;
 
-use KaririCode\Dotenv\Contract\TypeDetector;
-use KaririCode\Dotenv\Type\Detector\TypeDetectorRegistry;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeDetectorRegistry;
+use KaririCode\Dotenv\Type\Detector\DotenvTypeDetectorRegistry;
 use PHPUnit\Framework\TestCase;
 
 final class TypeDetectorRegistryTest extends TestCase
@@ -15,7 +16,7 @@ final class TypeDetectorRegistryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->registry = new TypeDetectorRegistry();
+        $this->registry = new DotenvTypeDetectorRegistry();
     }
 
     public function testRegisterDetector(): void

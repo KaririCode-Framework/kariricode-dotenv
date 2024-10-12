@@ -6,8 +6,10 @@ namespace Tests\Unit;
 
 use KaririCode\Dotenv\Contract\Loader;
 use KaririCode\Dotenv\Contract\Parser;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeSystem;
 use KaririCode\Dotenv\Dotenv;
-use KaririCode\Dotenv\Type\TypeSystem;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -50,7 +52,7 @@ final class DotenvTest extends TestCase
 
     public function testAddTypeDetector(): void
     {
-        $detector = $this->createMock(\KaririCode\Dotenv\Contract\TypeDetector::class);
+        $detector = $this->createMock(TypeDetector::class);
 
         $this->typeSystem->expects($this->once())
             ->method('registerDetector')
@@ -63,7 +65,7 @@ final class DotenvTest extends TestCase
 
     public function testAddTypeCaster(): void
     {
-        $caster = $this->createMock(\KaririCode\Dotenv\Contract\TypeCaster::class);
+        $caster = $this->createMock(TypeCaster::class);
 
         $this->typeSystem->expects($this->once())
             ->method('registerCaster')

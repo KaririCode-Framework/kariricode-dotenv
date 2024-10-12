@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Detector;
 
-use KaririCode\Dotenv\Contract\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
 
 abstract class AbstractTypeDetector implements TypeDetector
 {
