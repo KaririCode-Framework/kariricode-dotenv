@@ -15,7 +15,7 @@ trait CommonParserFunctionality
 
     protected function isComment(string $line): bool
     {
-        return str_starts_with($line, '#');
+        return 1 === preg_match('/^\s*#/', $line);
     }
 
     protected function containsSetterChar(string $line): bool
@@ -35,12 +35,22 @@ trait CommonParserFunctionality
 
     protected function sanitizeValue(string $value): string
     {
+        $value = trim($value);
+
         return $this->removeQuotes($value);
     }
 
     protected function removeQuotes(string $value): string
     {
-        return trim($value, '\'"');
+        if (strlen($value) > 1) {
+            $first = $value[0];
+            $last = $value[strlen($value) - 1];
+            if (('"' === $first && '"' === $last) || ("'" === $first && "'" === $last)) {
+                return substr($value, 1, -1);
+            }
+        }
+
+        return $value;
     }
 
     protected function isValidKey(?string $key): bool
