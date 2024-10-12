@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type;
 
-use KaririCode\Dotenv\Contract\TypeCaster;
-use KaririCode\Dotenv\Contract\TypeDetector;
-use KaririCode\Dotenv\Type\Caster\TypeCasterRegistry;
-use KaririCode\Dotenv\Type\Detector\TypeDetectorRegistry;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeCasterRegistry;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeDetectorRegistry;
+use KaririCode\Dotenv\Contract\Type\TypeSystem;
+use KaririCode\Dotenv\Type\Caster\DotenvTypeCasterRegistry;
+use KaririCode\Dotenv\Type\Detector\DotenvTypeDetectorRegistry;
 
-class TypeSystem
+class DotenvTypeSystem implements TypeSystem
 {
     public function __construct(
-        private $detectorRegistry = new TypeDetectorRegistry(),
-        private $casterRegistry = new TypeCasterRegistry()
+        private TypeDetectorRegistry $detectorRegistry = new DotenvTypeDetectorRegistry(),
+        private TypeCasterRegistry $casterRegistry = new DotenvTypeCasterRegistry()
     ) {
     }
 

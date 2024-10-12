@@ -7,16 +7,17 @@ namespace KaririCode\Dotenv;
 use KaririCode\Dotenv\Contract\Dotenv as DotenvContract;
 use KaririCode\Dotenv\Contract\Loader;
 use KaririCode\Dotenv\Contract\Parser;
-use KaririCode\Dotenv\Contract\TypeCaster;
-use KaririCode\Dotenv\Contract\TypeDetector;
-use KaririCode\Dotenv\Type\TypeSystem;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeSystem;
+use KaririCode\Dotenv\Type\DotenvTypeSystem;
 
 class Dotenv implements DotenvContract
 {
     public function __construct(
         private Parser $parser,
         private Loader $loader,
-        private TypeSystem $typeSystem = new TypeSystem()
+        private TypeSystem $typeSystem = new DotenvTypeSystem()
     ) {
     }
 

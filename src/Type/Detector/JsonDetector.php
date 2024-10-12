@@ -49,6 +49,10 @@ class JsonDetector extends AbstractTypeDetector
             return false;
         }
 
+        if (empty($decoded)) {
+            return true;
+        }
+
         foreach ($decoded as $item) {
             if (!is_array($item) || $this->isSequentialArray($item)) {
                 return false;

@@ -8,7 +8,9 @@ trait ArrayParserTrait
 {
     private function extractArrayElements(string $value): array
     {
-        return str_getcsv(substr($value, 1, -1));
+        $elements = str_getcsv(substr($value, 1, -1));
+
+        return array_map('trim', $elements);
     }
 
     private function allElementsMeet(array $elements, callable $condition): bool

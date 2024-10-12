@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Tests\Unit\Type\Detector;
 
-use KaririCode\Dotenv\Contract\TypeDetector;
-use KaririCode\Dotenv\Type\Detector\TypeDetectorRegistry;
+use KaririCode\DataStructure\Collection\ArrayList;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeDetectorRegistry;
+use KaririCode\Dotenv\Type\Detector\DotenvTypeDetectorRegistry;
 use PHPUnit\Framework\TestCase;
 
-final class TypeDetectorRegistryTest extends TestCase
+final class DotenvTypeDetectorRegistryTest extends TestCase
 {
     private TypeDetectorRegistry $registry;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->registry = new TypeDetectorRegistry();
+        $this->registry = new DotenvTypeDetectorRegistry();
     }
 
     public function testRegisterDetector(): void
@@ -61,7 +63,27 @@ final class TypeDetectorRegistryTest extends TestCase
         $this->registry->registerDetector($mockDetector);
 
         $result = $this->registry->detectType('test_value');
-        $this->assertSame('string', $result);
+        $this->assertSame('string', $result, "Should fallback to 'string' when no detector matches");
+    }
+
+
+    public function testFallbackToStringForUnrecognizedTypes(): void
+    {
+        // Remove all default detectors
+        $reflectionProperty = new \ReflectionProperty(DotenvTypeDetectorRegistry::class, 'detectors');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->registry, new \KaririCode\DataStructure\Collection\ArrayList());
+
+        $unrecognizedValues = [
+            'complex_value' => new \stdClass(),
+            'resource' => fopen('php://memory', 'r'),
+            'closure' => function () {},
+        ];
+
+        foreach ($unrecognizedValues as $description => $value) {
+            $result = $this->registry->detectType($value);
+            $this->assertSame('string', $result, "Should fallback to 'string' for $description");
+        }
     }
 
     public function testDefaultDetectors(): void

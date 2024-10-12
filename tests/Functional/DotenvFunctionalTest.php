@@ -6,11 +6,11 @@ namespace KaririCode\Dotenv\Tests;
 
 use KaririCode\Dotenv\Contract\Loader;
 use KaririCode\Dotenv\Contract\Parser;
-use KaririCode\Dotenv\Contract\TypeCaster;
-use KaririCode\Dotenv\Contract\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeDetector;
+use KaririCode\Dotenv\Contract\Type\TypeSystem;
 use KaririCode\Dotenv\Dotenv;
 use KaririCode\Dotenv\Exception\InvalidValueException;
-use KaririCode\Dotenv\Type\TypeSystem;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

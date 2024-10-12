@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace KaririCode\Dotenv\Contract;
+namespace KaririCode\Dotenv\Contract\Type;
 
 interface TypeCaster
 {

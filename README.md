@@ -132,7 +132,7 @@ $dotenv->addTypeDetector(new CustomDetector());
 Create custom type casters to handle specific data types:
 
 ```php
-use KaririCode\Dotenv\Contract\TypeCaster;
+use KaririCode\Dotenv\Contract\Type\TypeCaster;
 
 class CustomCaster implements TypeCaster
 {

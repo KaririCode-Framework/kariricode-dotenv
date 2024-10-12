@@ -4,44 +4,24 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Parser;
 
-use KaririCode\Dotenv\Contract\Parser;
-use KaririCode\Dotenv\Parser\Trait\LineParsing;
-use KaririCode\Dotenv\Parser\Trait\ValueInterpolation;
+use KaririCode\Dotenv\Parser\Trait\CommonParserFunctionality;
 
-class DefaultParser implements Parser
+class DefaultParser extends AbstractParser
 {
-    use LineParsing;
-    use ValueInterpolation;
+    use CommonParserFunctionality;
 
-    public function parse(string $content): array
+    public function parseLines(array $lines): array
     {
-        $lines = $this->splitLines($content);
         $parsedValues = [];
-
         foreach ($lines as $line) {
             if ($this->isValidSetter($line)) {
                 [$key, $value] = $this->parseEnvironmentVariable($line);
-                if (null !== $key && '' !== $key) {
-                    $parsedValues[$key] = $this->removeQuotes($value);
+                if ($this->isValidKey($key)) {
+                    $parsedValues[$key] = $this->sanitizeValue($value);
                 }
             }
         }
 
-        // Perform interpolation after all variables are parsed
-        foreach ($parsedValues as $key => $value) {
-            $parsedValues[$key] = $this->interpolateValue($value, $parsedValues);
-        }
-
         return $parsedValues;
-    }
-
-    private function validateVariableName(?string $name): bool
-    {
-        return null !== $name && '' !== $name;
-    }
-
-    private function removeQuotes(string $value): string
-    {
-        return trim($value, '\'"');
     }
 }
