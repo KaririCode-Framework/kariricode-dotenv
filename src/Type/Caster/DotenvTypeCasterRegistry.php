@@ -35,18 +35,12 @@ class DotenvTypeCasterRegistry implements TypeCasterRegistry
 
     private function registerDefaultCasters(): void
     {
-        $defaultCasters = [
-            'array' => new ArrayCaster(),
-            'json' => new JsonCaster(),
-            'null' => new NullCaster(),
-            'boolean' => new BooleanCaster(),
-            'integer' => new IntegerCaster(),
-            'float' => new FloatCaster(),
-            'string' => new StringCaster(),
-        ];
-
-        foreach ($defaultCasters as $type => $caster) {
-            $this->register($type, $caster);
-        }
+        $this->register('array', new ArrayCaster());
+        $this->register('json', new JsonCaster());
+        $this->register('null', new NullCaster());
+        $this->register('boolean', new BooleanCaster());
+        $this->register('integer', new IntegerCaster());
+        $this->register('float', new FloatCaster());
+        $this->register('string', new StringCaster());
     }
 }
