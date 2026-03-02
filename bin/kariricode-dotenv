@@ -1,0 +1,510 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * KaririCode Dotenv CLI — standalone tooling for .env files.
+ *
+ * Usage:
+ *   kariricode-dotenv <command> [options]
+ *
+ * Commands:
+ *   debug              List all loaded variables with types and sources
+ *   validate           Validate .env against .env.example or .env.schema
+ *   encrypt            Encrypt plaintext values in a .env file
+ *   decrypt            Decrypt encrypted values in a .env file
+ *   cache:dump         Generate OPcache-friendly PHP cache
+ *   cache:clear        Remove the PHP cache file
+ *   diff               Compare two .env files
+ *   example:generate   Generate .env.example from .env (strips values)
+ *   keygen             Generate a new encryption key pair
+ */
+
+namespace KaririCode\Dotenv\Console;
+
+// Autoload resolution: find vendor/autoload.php
+(static function (): void {
+    $candidates = [
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../../../autoload.php',
+    ];
+
+    foreach ($candidates as $file) {
+        if (is_file($file)) {
+            require $file;
+
+            return;
+        }
+    }
+
+    fwrite(STDERR, "Cannot find vendor/autoload.php. Run: composer install\n");
+    exit(1);
+})();
+
+use KaririCode\Dotenv\Cache\PhpFileCache;
+use KaririCode\Dotenv\Dotenv;
+use KaririCode\Dotenv\Security\Encryptor;
+use KaririCode\Dotenv\Security\KeyPair;
+use KaririCode\Dotenv\ValueObject\DotenvConfiguration;
+
+// ── Argument Parsing ──────────────────────────────────────────────────
+
+$args = array_slice($argv, 1);
+$command = $args[0] ?? 'help';
+$options = parseOptions(array_slice($args, 1));
+
+match ($command) {
+    'debug' => commandDebug($options),
+    'validate' => commandValidate($options),
+    'encrypt' => commandEncrypt($options),
+    'decrypt' => commandDecrypt($options),
+    'cache:dump' => commandCacheDump($options),
+    'cache:clear' => commandCacheClear($options),
+    'diff' => commandDiff($options),
+    'example:generate' => commandExampleGenerate($options),
+    'keygen' => commandKeygen(),
+    'help', '--help', '-h' => commandHelp(),
+    default => commandHelp("Unknown command: {$command}"),
+};
+
+// ── Commands ──────────────────────────────────────────────────────────
+
+function commandDebug(array $options): void
+{
+    $dir = $options['dir'] ?? getcwd();
+    $dotenv = new Dotenv($dir);
+
+    try {
+        $dotenv->safeLoad();
+    } catch (\Throwable $e) {
+        stderr("Error loading .env: {$e->getMessage()}");
+        exit(1);
+    }
+
+    $debug = $dotenv->debug();
+
+    if ($debug === []) {
+        stdout("No variables loaded.");
+
+        return;
+    }
+
+    stdout(sprintf("%-30s %-10s %-10s %s", 'VARIABLE', 'TYPE', 'SOURCE', 'VALUE'));
+    stdout(str_repeat('─', 72));
+
+    foreach ($debug as $name => $info) {
+        $display = is_scalar($info['value'])
+            ? var_export($info['value'], true)
+            : gettype($info['value']);
+
+        $override = $info['overridden'] ? ' (overridden)' : '';
+
+        stdout(sprintf(
+            "%-30s %-10s %-10s %s%s",
+            $name,
+            $info['type'],
+            $info['source'],
+            truncate($display, 40),
+            $override,
+        ));
+    }
+
+    stdout("\nTotal: " . count($debug) . " variables.");
+}
+
+function commandValidate(array $options): void
+{
+    $dir = $options['dir'] ?? getcwd();
+    $schemaFile = $options['schema'] ?? null;
+    $exampleFile = $options['example'] ?? null;
+
+    $dotenv = new Dotenv($dir);
+
+    try {
+        $dotenv->safeLoad();
+    } catch (\Throwable $e) {
+        stderr("Error loading .env: {$e->getMessage()}");
+        exit(1);
+    }
+
+    // Schema-based validation
+    if ($schemaFile !== null) {
+        $schemaPath = is_file($schemaFile) ? $schemaFile : $dir . DIRECTORY_SEPARATOR . $schemaFile;
+
+        try {
+            $dotenv->loadWithSchema($schemaPath);
+            stdout("✓ All schema rules passed.");
+        } catch (\Throwable $e) {
+            stderr("✗ Schema validation failed:\n{$e->getMessage()}");
+            exit(1);
+        }
+
+        return;
+    }
+
+    // Example-based validation (check all keys in .env.example exist in .env)
+    $examplePath = $exampleFile ?? $dir . DIRECTORY_SEPARATOR . '.env.example';
+
+    if (!is_file($examplePath)) {
+        stderr("No .env.example or --schema found. Nothing to validate.");
+        exit(1);
+    }
+
+    $exampleContent = file_get_contents($examplePath);
+    $loaded = $dotenv->variables();
+    $missing = [];
+
+    foreach (explode("\n", $exampleContent) as $line) {
+        $line = trim($line);
+
+        if ($line === '' || $line[0] === '#') {
+            continue;
+        }
+
+        if (preg_match('/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=/', $line, $m)) {
+            $name = $m[1];
+
+            if (!isset($loaded[$name]) && !isset($_ENV[$name])) {
+                $missing[] = $name;
+            }
+        }
+    }
+
+    if ($missing === []) {
+        stdout("✓ All variables from .env.example are defined.");
+    } else {
+        stderr("✗ Missing variables:\n  " . implode("\n  ", $missing));
+        exit(1);
+    }
+}
+
+function commandEncrypt(array $options): void
+{
+    $file = $options['_positional'][0] ?? '.env';
+    $keyArg = $options['key'] ?? null;
+
+    if (!is_file($file)) {
+        stderr("File not found: {$file}");
+        exit(1);
+    }
+
+    if ($keyArg === null) {
+        // Generate a new key
+        $keyPair = KeyPair::generate();
+        $keyArg = $keyPair->privateKey;
+        stdout("Generated new encryption key:");
+        stdout("DOTENV_PRIVATE_KEY={$keyPair->privateKey}");
+        stdout("Key ID: {$keyPair->publicId}");
+        stdout("");
+    }
+
+    $encryptor = new Encryptor($keyArg);
+    $content = file_get_contents($file);
+    $lines = explode("\n", $content);
+    $output = [];
+
+    foreach ($lines as $line) {
+        $trimmed = trim($line);
+
+        if ($trimmed === '' || $trimmed[0] === '#' || !str_contains($trimmed, '=')) {
+            $output[] = $line;
+            continue;
+        }
+
+        $eqPos = strpos($trimmed, '=');
+        $key = substr($trimmed, 0, $eqPos);
+        $value = substr($trimmed, $eqPos + 1);
+
+        // Strip quotes
+        if ((str_starts_with($value, '"') && str_ends_with($value, '"'))
+            || (str_starts_with($value, "'") && str_ends_with($value, "'"))) {
+            $value = substr($value, 1, -1);
+        }
+
+        // Skip already encrypted
+        if (Encryptor::isEncrypted($value)) {
+            $output[] = $line;
+            continue;
+        }
+
+        $encrypted = $encryptor->encrypt($value);
+        $output[] = "{$key}=\"{$encrypted}\"";
+    }
+
+    file_put_contents($file, implode("\n", $output));
+    stdout("✓ Encrypted values in {$file}");
+    stdout("Store DOTENV_PRIVATE_KEY securely — it is required for decryption.");
+}
+
+function commandDecrypt(array $options): void
+{
+    $file = $options['_positional'][0] ?? '.env';
+    $keyArg = $options['key'] ?? $_SERVER['DOTENV_PRIVATE_KEY'] ?? $_ENV['DOTENV_PRIVATE_KEY'] ?? null;
+
+    if (!is_file($file)) {
+        stderr("File not found: {$file}");
+        exit(1);
+    }
+
+    if ($keyArg === null) {
+        stderr("No decryption key provided. Use --key=<hex> or set DOTENV_PRIVATE_KEY.");
+        exit(1);
+    }
+
+    $encryptor = new Encryptor($keyArg);
+    $content = file_get_contents($file);
+    $lines = explode("\n", $content);
+    $output = [];
+
+    foreach ($lines as $line) {
+        $trimmed = trim($line);
+
+        if ($trimmed === '' || $trimmed[0] === '#' || !str_contains($trimmed, '=')) {
+            $output[] = $line;
+            continue;
+        }
+
+        $eqPos = strpos($trimmed, '=');
+        $key = substr($trimmed, 0, $eqPos);
+        $value = substr($trimmed, $eqPos + 1);
+
+        // Strip quotes
+        $raw = $value;
+
+        if ((str_starts_with($value, '"') && str_ends_with($value, '"'))
+            || (str_starts_with($value, "'") && str_ends_with($value, "'"))) {
+            $raw = substr($value, 1, -1);
+        }
+
+        if (Encryptor::isEncrypted($raw)) {
+            $decrypted = $encryptor->decrypt($raw);
+            $output[] = "{$key}=\"{$decrypted}\"";
+        } else {
+            $output[] = $line;
+        }
+    }
+
+    file_put_contents($file, implode("\n", $output));
+    stdout("✓ Decrypted values in {$file}");
+}
+
+function commandCacheDump(array $options): void
+{
+    $dir = $options['dir'] ?? getcwd();
+    $output = $options['output'] ?? $dir . DIRECTORY_SEPARATOR . '.env.cache.php';
+
+    $dotenv = new Dotenv($dir);
+
+    try {
+        $dotenv->safeLoad();
+    } catch (\Throwable $e) {
+        stderr("Error loading .env: {$e->getMessage()}");
+        exit(1);
+    }
+
+    $dotenv->dumpCache($output);
+    stdout("✓ Cache written to {$output}");
+}
+
+function commandCacheClear(array $options): void
+{
+    $dir = $options['dir'] ?? getcwd();
+    $path = $options['path'] ?? $dir . DIRECTORY_SEPARATOR . '.env.cache.php';
+
+    (new PhpFileCache())->clear($path);
+    stdout("✓ Cache cleared: {$path}");
+}
+
+function commandDiff(array $options): void
+{
+    $files = $options['_positional'] ?? [];
+
+    if (count($files) < 2) {
+        stderr("Usage: kariricode-dotenv diff <file1> <file2>");
+        exit(1);
+    }
+
+    $vars1 = parseEnvFileKeys($files[0]);
+    $vars2 = parseEnvFileKeys($files[1]);
+
+    $onlyIn1 = array_diff_key($vars1, $vars2);
+    $onlyIn2 = array_diff_key($vars2, $vars1);
+    $different = [];
+
+    foreach ($vars1 as $key => $val) {
+        if (isset($vars2[$key]) && $vars2[$key] !== $val) {
+            $different[$key] = [$val, $vars2[$key]];
+        }
+    }
+
+    $base1 = basename($files[0]);
+    $base2 = basename($files[1]);
+
+    if ($onlyIn1 === [] && $onlyIn2 === [] && $different === []) {
+        stdout("✓ Files are identical.");
+
+        return;
+    }
+
+    if ($onlyIn1 !== []) {
+        stdout("Only in {$base1}:");
+
+        foreach ($onlyIn1 as $key => $val) {
+            stdout("  + {$key}");
+        }
+    }
+
+    if ($onlyIn2 !== []) {
+        stdout("Only in {$base2}:");
+
+        foreach ($onlyIn2 as $key => $val) {
+            stdout("  + {$key}");
+        }
+    }
+
+    if ($different !== []) {
+        stdout("Different values:");
+
+        foreach ($different as $key => [$v1, $v2]) {
+            stdout("  ~ {$key}");
+            stdout("    {$base1}: {$v1}");
+            stdout("    {$base2}: {$v2}");
+        }
+    }
+}
+
+function commandExampleGenerate(array $options): void
+{
+    $input = $options['_positional'][0] ?? '.env';
+    $output = $options['output'] ?? '.env.example';
+
+    if (!is_file($input)) {
+        stderr("File not found: {$input}");
+        exit(1);
+    }
+
+    $content = file_get_contents($input);
+    $lines = explode("\n", $content);
+    $result = [];
+
+    foreach ($lines as $line) {
+        $trimmed = trim($line);
+
+        if ($trimmed === '' || $trimmed[0] === '#') {
+            $result[] = $line;
+            continue;
+        }
+
+        if (preg_match('/^((?:export\s+)?[A-Za-z_][A-Za-z0-9_]*)=/', $trimmed, $m)) {
+            $result[] = $m[1] . '=';
+        } else {
+            $result[] = $line;
+        }
+    }
+
+    file_put_contents($output, implode("\n", $result));
+    stdout("✓ Generated {$output} from {$input}");
+}
+
+function commandKeygen(): void
+{
+    $keyPair = KeyPair::generate();
+    stdout("Key ID:              {$keyPair->publicId}");
+    stdout("DOTENV_PRIVATE_KEY=  {$keyPair->privateKey}");
+    stdout("");
+    stdout("Add to your server environment (NOT to .env files):");
+    stdout("  export DOTENV_PRIVATE_KEY={$keyPair->privateKey}");
+}
+
+function commandHelp(string $error = ''): void
+{
+    if ($error !== '') {
+        stderr($error);
+        stderr('');
+    }
+
+    stdout('KaririCode Dotenv CLI v4.x');
+    stdout('');
+    stdout('Usage: kariricode-dotenv <command> [options]');
+    stdout('');
+    stdout('Commands:');
+    stdout('  debug              List all loaded variables with types and sources');
+    stdout('  validate           Validate .env against .env.example or --schema=file');
+    stdout('  encrypt [file]     Encrypt plaintext values (--key=<hex> or auto-generate)');
+    stdout('  decrypt [file]     Decrypt encrypted values (--key=<hex> or DOTENV_PRIVATE_KEY)');
+    stdout('  cache:dump         Generate OPcache-friendly .env.cache.php');
+    stdout('  cache:clear        Remove the cache file');
+    stdout('  diff <f1> <f2>     Compare two .env files');
+    stdout('  example:generate   Generate .env.example from .env (strips values)');
+    stdout('  keygen             Generate a new encryption key pair');
+    stdout('');
+    stdout('Options:');
+    stdout('  --dir=<path>       Project directory (default: cwd)');
+    stdout('  --schema=<file>    Schema file for validation');
+    stdout('  --example=<file>   Example file for validation');
+    stdout('  --key=<hex>        Encryption/decryption key (64-char hex)');
+    stdout('  --output=<file>    Output file path');
+
+    exit($error !== '' ? 1 : 0);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────
+
+function parseOptions(array $args): array
+{
+    $options = ['_positional' => []];
+
+    foreach ($args as $arg) {
+        if (str_starts_with($arg, '--') && str_contains($arg, '=')) {
+            $eqPos = strpos($arg, '=');
+            $key = substr($arg, 2, $eqPos - 2);
+            $options[$key] = substr($arg, $eqPos + 1);
+        } elseif (str_starts_with($arg, '--')) {
+            $options[substr($arg, 2)] = true;
+        } else {
+            $options['_positional'][] = $arg;
+        }
+    }
+
+    return $options;
+}
+
+function parseEnvFileKeys(string $file): array
+{
+    if (!is_file($file)) {
+        stderr("File not found: {$file}");
+        exit(1);
+    }
+
+    $vars = [];
+
+    foreach (explode("\n", file_get_contents($file)) as $line) {
+        $line = trim($line);
+
+        if ($line === '' || $line[0] === '#') {
+            continue;
+        }
+
+        if (preg_match('/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/', $line, $m)) {
+            $vars[$m[1]] = $m[2];
+        }
+    }
+
+    return $vars;
+}
+
+function stdout(string $msg): void
+{
+    fwrite(STDOUT, $msg . "\n");
+}
+
+function stderr(string $msg): void
+{
+    fwrite(STDERR, $msg . "\n");
+}
+
+function truncate(string $str, int $max): string
+{
+    return strlen($str) > $max ? substr($str, 0, $max - 3) . '...' : $str;
+}

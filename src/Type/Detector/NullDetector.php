@@ -4,16 +4,32 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Detector;
 
-class NullDetector extends AbstractTypeDetector
+use KaririCode\Dotenv\Contract\TypeDetector;
+use KaririCode\Dotenv\Enum\ValueType;
+
+/**
+ * Detects null literals: "null", "NULL", "(null)".
+ *
+ * Empty string ('') is intentionally excluded — `FOO=` must yield an
+ * empty string, not null. This matches POSIX behavior and prevents
+ * data loss when distinguishing between `FOO=` and `FOO=null`.
+ *
+ * @package KaririCode\Dotenv
+ * @since   4.0.0 ARFA 1.3
+ */
+final readonly class NullDetector implements TypeDetector
 {
-    public const PRIORITY = 95;
+    private const array NULL_LITERALS = ['null', 'NULL', '(null)'];
 
-    public function detect(mixed $value): ?string
+    #[\Override]
+    public function priority(): int
     {
-        if (null === $value || 'null' === strtolower($value) || '' === $value) {
-            return 'null';
-        }
+        return 200;
+    }
 
-        return null;
+    #[\Override]
+    public function detect(string $value): ?ValueType
+    {
+        return \in_array($value, self::NULL_LITERALS, true) ? ValueType::Null : null;
     }
 }

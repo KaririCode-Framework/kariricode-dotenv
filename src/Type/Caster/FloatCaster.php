@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Caster;
 
-use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\TypeCaster;
 
-class FloatCaster implements TypeCaster
+/**
+ * @package KaririCode\Dotenv
+ * @since   4.0.0 ARFA 1.3
+ */
+final readonly class FloatCaster implements TypeCaster
 {
-    public function canCast(mixed $value): bool
-    {
-        return is_numeric($value) && false !== strpos((string) $value, '.');
-    }
-
-    public function cast(mixed $value): float
+    #[\Override]
+    public function cast(string $value): float
     {
         return (float) $value;
     }

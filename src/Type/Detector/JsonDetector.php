@@ -4,83 +4,34 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Detector;
 
-use KaririCode\Dotenv\Type\Detector\Trait\ArrayParserTrait;
-use KaririCode\Dotenv\Type\Detector\Trait\StringValidatorTrait;
+use KaririCode\Dotenv\Contract\TypeDetector;
+use KaririCode\Dotenv\Enum\ValueType;
 
-class JsonDetector extends AbstractTypeDetector
+/**
+ * Detects JSON object values: strings wrapped in curly braces that decode successfully.
+ *
+ * @package KaririCode\Dotenv
+ * @since   4.0.0 ARFA 1.3
+ */
+final readonly class JsonDetector implements TypeDetector
 {
-    use StringValidatorTrait;
-    use ArrayParserTrait;
-
-    public const PRIORITY = 90;
-
-    public function detect(mixed $value): ?string
+    #[\Override]
+    public function priority(): int
     {
-        if (!$this->isStringInput($value)) {
+        return 160;
+    }
+
+    #[\Override]
+    public function detect(string $value): ?ValueType
+    {
+        $trimmed = trim($value);
+
+        if (! str_starts_with($trimmed, '{') || ! str_ends_with($trimmed, '}')) {
             return null;
         }
 
-        $cleanValue = $this->removeWhitespace($value);
+        json_decode($trimmed);
 
-        if ($this->isJsonObject($cleanValue)) {
-            return 'json';
-        }
-
-        if ($this->isJsonArrayOfObjects($cleanValue)) {
-            return 'json';
-        }
-
-        return null;
-    }
-
-    private function isJsonObject(string $value): bool
-    {
-        return $this->isObjectFormat($value) && $this->isValidJson($value);
-    }
-
-    private function isJsonArrayOfObjects(string $value): bool
-    {
-        if (!$this->isArrayFormat($value)) {
-            return false;
-        }
-
-        $decoded = json_decode($value, true);
-        if (JSON_ERROR_NONE !== json_last_error() || !is_array($decoded)) {
-            return false;
-        }
-
-        if (empty($decoded)) {
-            return true;
-        }
-
-        foreach ($decoded as $item) {
-            if (!is_array($item) || $this->isSequentialArray($item)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function isObjectFormat(string $value): bool
-    {
-        return $this->hasDelimiters($value, '{', '}');
-    }
-
-    private function isArrayFormat(string $value): bool
-    {
-        return $this->hasDelimiters($value, '[', ']');
-    }
-
-    private function isValidJson(string $value): bool
-    {
-        json_decode($value);
-
-        return JSON_ERROR_NONE === json_last_error();
-    }
-
-    private function isSequentialArray(array $arr): bool
-    {
-        return array_keys($arr) === range(0, count($arr) - 1);
+        return json_last_error() === JSON_ERROR_NONE ? ValueType::Json : null;
     }
 }
