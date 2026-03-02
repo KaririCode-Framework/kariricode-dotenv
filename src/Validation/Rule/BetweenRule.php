@@ -17,11 +17,11 @@ final readonly class BetweenRule implements ValidationRule
     #[\Override]
     public function passes(string $value): bool
     {
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return false;
         }
 
-        $numeric = $value + 0;
+        $numeric = (float) $value;
 
         return $numeric >= $this->min && $numeric <= $this->max;
     }

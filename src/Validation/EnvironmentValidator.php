@@ -67,8 +67,8 @@ final class EnvironmentValidator
      */
     public function required(string ...$names): self
     {
-        $this->requiredNames = array_merge($this->requiredNames, $names);
-        $this->currentTargets = $names;
+        $this->requiredNames = array_values(array_merge($this->requiredNames, $names));
+        $this->currentTargets = array_values($names);
         $this->conditionalMode = false;
 
         return $this;
@@ -80,7 +80,7 @@ final class EnvironmentValidator
      */
     public function ifPresent(string ...$names): self
     {
-        $this->currentTargets = $names;
+        $this->currentTargets = array_values($names);
         $this->conditionalMode = true;
 
         return $this;
@@ -90,22 +90,22 @@ final class EnvironmentValidator
 
     public function notEmpty(string ...$names): self
     {
-        return $this->applyRule(new NotEmptyRule(), $names);
+        return $this->applyRule(new NotEmptyRule(), array_values($names));
     }
 
     public function isInteger(string ...$names): self
     {
-        return $this->applyRule(new IsIntegerRule(), $names);
+        return $this->applyRule(new IsIntegerRule(), array_values($names));
     }
 
     public function isBoolean(string ...$names): self
     {
-        return $this->applyRule(new IsBooleanRule(), $names);
+        return $this->applyRule(new IsBooleanRule(), array_values($names));
     }
 
     public function isNumeric(string ...$names): self
     {
-        return $this->applyRule(new IsNumericRule(), $names);
+        return $this->applyRule(new IsNumericRule(), array_values($names));
     }
 
     /**
@@ -121,7 +121,7 @@ final class EnvironmentValidator
     {
         $this->currentTargets = [$name];
 
-        return $this->applyRule(new AllowedValuesRule($allowed), []);
+        return $this->applyRule(new AllowedValuesRule(array_values($allowed)), []);
     }
 
     public function matchesRegex(string $name, string $pattern): self
@@ -133,12 +133,12 @@ final class EnvironmentValidator
 
     public function url(string ...$names): self
     {
-        return $this->applyRule(new UrlRule(), $names);
+        return $this->applyRule(new UrlRule(), array_values($names));
     }
 
     public function email(string ...$names): self
     {
-        return $this->applyRule(new EmailRule(), $names);
+        return $this->applyRule(new EmailRule(), array_values($names));
     }
 
     /**
@@ -157,7 +157,7 @@ final class EnvironmentValidator
      */
     public function rule(ValidationRule $rule, string ...$names): self
     {
-        return $this->applyRule($rule, $names);
+        return $this->applyRule($rule, array_values($names));
     }
 
     // ── Execution ─────────────────────────────────────────────────────
@@ -197,7 +197,7 @@ final class EnvironmentValidator
                 }
 
                 // Already reported as missing-required above, don't run rules
-                if (in_array($name, $this->requiredNames, true)) {
+                if (\in_array($name, $this->requiredNames, true)) {
                     continue;
                 }
 
@@ -206,7 +206,7 @@ final class EnvironmentValidator
             }
 
             foreach ($ruleList as $rule) {
-                if (!$rule->passes($value)) {
+                if (! $rule->passes($value)) {
                     $errors[] = str_replace('{name}', $name, $rule->message());
                 }
             }

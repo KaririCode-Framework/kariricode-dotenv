@@ -16,6 +16,7 @@ final readonly class MatchesRegexRule implements ValidationRule
     #[\Override]
     public function passes(string $value): bool
     {
+        /** @psalm-suppress ArgumentTypeCoercion — pattern is always non-empty (set via constructor) */
         return preg_match($this->pattern, $value) === 1;
     }
 
