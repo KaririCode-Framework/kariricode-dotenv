@@ -193,10 +193,10 @@ final class Dotenv
         $this->loadFile($basePath . '.local', required: false);
 
         // Determine environment name
-        $envName = $environmentName
+        $envName = (string) ($environmentName
             ?? $this->configuration->environmentName
             ?? $this->resolveRawValue('APP_ENV')
-            ?? 'dev';
+            ?? 'dev');
 
         // 3. .env.{env} (committed env-specific defaults)
         $this->loadFile("{$basePath}.{$envName}", required: false);
@@ -220,9 +220,9 @@ final class Dotenv
     {
         $missing = array_filter(
             $names,
-            fn (string $name): bool => !isset($this->variables[$name])
-                && !isset($_ENV[$name])
-                && !isset($_SERVER[$name]),
+            fn (string $name): bool => ! isset($this->variables[$name])
+                && ! isset($_ENV[$name])
+                && ! isset($_SERVER[$name]),
         );
 
         if ($missing !== []) {
@@ -243,7 +243,11 @@ final class Dotenv
     public function validate(): EnvironmentValidator
     {
         return new EnvironmentValidator(
-            fn (string $name): ?string => $this->resolveRawValue($name),
+            function (string $name): ?string {
+                $raw = $this->resolveRawValue($name);
+
+                return $raw !== null ? (string) $raw : null;
+            },
         );
     }
 
@@ -255,11 +259,11 @@ final class Dotenv
      */
     public function loadWithSchema(string $schemaPath): void
     {
-        if (!$this->loaded) {
+        if (! $this->loaded) {
             $this->load();
         }
 
-        if (!is_file($schemaPath) || !is_readable($schemaPath)) {
+        if (! is_file($schemaPath) || ! is_readable($schemaPath)) {
             throw FileNotFoundException::forPath($schemaPath);
         }
 
@@ -341,7 +345,7 @@ final class Dotenv
 
     public function clearCache(string $path): void
     {
-        (new PhpFileCache())->clear($path);
+        new PhpFileCache()->clear($path);
     }
 
     // ── Extension Points ──────────────────────────────────────────────
@@ -394,7 +398,7 @@ final class Dotenv
 
     private function loadFile(string $filePath, bool $required): void
     {
-        if (!is_file($filePath) || !is_readable($filePath)) {
+        if (! is_file($filePath) || ! is_readable($filePath)) {
             if ($required) {
                 throw FileNotFoundException::forPath($filePath);
             }
@@ -428,7 +432,7 @@ final class Dotenv
     private function setVariable(string $name, string $rawValue, string $source): void
     {
         // Allow/Deny list filtering
-        if (!$this->isAllowed($name)) {
+        if (! $this->isAllowed($name)) {
             return;
         }
 
@@ -437,7 +441,7 @@ final class Dotenv
         // Immutable: throw if variable existed BEFORE this instance loaded it
         if ($this->configuration->loadMode === LoadMode::Immutable
             && $alreadyExists
-            && !isset($this->variables[$name])
+            && ! isset($this->variables[$name])
         ) {
             throw ImmutableException::alreadyDefined($name);
         }
@@ -467,7 +471,12 @@ final class Dotenv
 
         $overridden = isset($this->variables[$name]);
         $this->variables[$name] = new EnvironmentVariable(
-            $name, $decryptedValue, $type, $typedValue, $source, $overridden,
+            $name,
+            $decryptedValue,
+            $type,
+            $typedValue,
+            $source,
+            $overridden,
         );
 
         // Populate environment with decrypted raw string
@@ -535,17 +544,23 @@ final class Dotenv
         return $typedValue;
     }
 
-    /**
-     * @return null|scalar|string[]
-     *
-     * @psalm-return non-empty-list<string>|null|scalar
-     */
-    private function resolveRawValue(string $name)
+    private function resolveRawValue(string $name): ?string
     {
         if (isset($this->variables[$name])) {
             return $this->variables[$name]->rawValue;
         }
 
-        return $_ENV[$name] ?? $_SERVER[$name] ?? null;
+        $envVal    = $_ENV[$name] ?? null;
+        $serverVal = $_SERVER[$name] ?? null;
+
+        if (\is_string($envVal)) {
+            return $envVal;
+        }
+
+        if (\is_string($serverVal)) {
+            return $serverVal;
+        }
+
+        return null;
     }
 }

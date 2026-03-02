@@ -48,7 +48,7 @@ final class DotenvParser
         $lines = $this->normalizeLines($content);
         $lineNumber = 0;
 
-        while ($lineNumber < count($lines)) {
+        while ($lineNumber < \count($lines)) {
             $line = $lines[$lineNumber];
             // Increment first: $lineNumber becomes 1-indexed (for error messages) and
             // simultaneously equals the 0-indexed position of the next line (for multiline
@@ -143,7 +143,7 @@ final class DotenvParser
         $extraLines = 0;
 
         while (true) {
-            $length = strlen($value);
+            $length = \strlen($value);
 
             for ($i = 0; $i < $length; ++$i) {
                 $char = $value[$i];
@@ -177,7 +177,7 @@ final class DotenvParser
 
             // Value continues on next line
             $nextLineIndex = $currentLine + $extraLines;
-            if ($nextLineIndex >= count($lines)) {
+            if ($nextLineIndex >= \count($lines)) {
                 throw ParseException::unterminatedQuote($currentLine, $filePath);
             }
 
@@ -224,22 +224,17 @@ final class DotenvParser
         // Expand ${VAR:-default} and ${VAR:+alternate} syntax
         $value = preg_replace_callback(
             '/\$\{([A-Za-z_][A-Za-z0-9_]*)(?:(:[-+])(.*?))?\}/',
-            /**
-             * @return scalar|string[]
-             *
-             * @psalm-return non-empty-list<string>|scalar
-             */
-            static function (array $matches) use ($resolvedVariables) {
-                $name = $matches[1];
+            static function (array $matches) use ($resolvedVariables): string {
+                $name     = $matches[1];
                 $operator = $matches[2] ?? '';
-                $operand = $matches[3] ?? '';
+                $operand  = $matches[3] ?? '';
 
                 $resolved = $resolvedVariables[$name]
-                    ?? $_ENV[$name]
-                    ?? $_SERVER[$name]
+                    ?? (isset($_ENV[$name]) && \is_string($_ENV[$name]) ? $_ENV[$name] : null)
+                    ?? (isset($_SERVER[$name]) && \is_string($_SERVER[$name]) ? $_SERVER[$name] : null)
                     ?? null;
 
-                return match ($operator) {
+                return (string) match ($operator) {
                     // ${VAR:+alternate} — use alternate if VAR is set and non-empty
                     ':+' => ($resolved !== null && $resolved !== '') ? $operand : '',
                     // ${VAR:-default} — use default if VAR is unset or empty
@@ -254,17 +249,12 @@ final class DotenvParser
         // Expand bare $VAR syntax
         $value = preg_replace_callback(
             '/\$([A-Za-z_][A-Za-z0-9_]*)/',
-            /**
-             * @return scalar|string[]
-             *
-             * @psalm-return non-empty-list<string>|scalar
-             */
-            static function (array $matches) use ($resolvedVariables) {
+            static function (array $matches) use ($resolvedVariables): string {
                 $name = $matches[1];
 
                 return $resolvedVariables[$name]
-                    ?? $_ENV[$name]
-                    ?? $_SERVER[$name]
+                    ?? (isset($_ENV[$name]) && \is_string($_ENV[$name]) ? $_ENV[$name] : null)
+                    ?? (isset($_SERVER[$name]) && \is_string($_SERVER[$name]) ? $_SERVER[$name] : null)
                     ?? '';
             },
             $value,
