@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    name: Quality Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, openssl
+          coverage: pcov
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Initialize kcode devkit
+        run: vendor/bin/kcode init
+
+      - name: Code style check
+        run: vendor/bin/kcode cs:fix --check
+
+      - name: Static analysis (PHPStan + Psalm)
+        run: vendor/bin/kcode analyse
+
+      - name: Tests with coverage
+        run: vendor/bin/kcode test --coverage

@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, openssl
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Initialize kcode devkit
+        run: vendor/bin/kcode init
+
+      - name: Run full quality pipeline
+        run: vendor/bin/kcode quality
+
+      - name: Extract version from tag
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: KaririCode Dotenv ${{ steps.version.outputs.tag }}
+          draft: false
+          prerelease: false
+          body: |
+            ## KaririCode\\Dotenv ${{ steps.version.outputs.tag }}
+
+            The only PHP dotenv with auto type casting, AES-256-GCM encryption,
+            OPcache caching, fluent validation DSL, environment-aware loading,
+            and CLI tooling — zero dependencies, PHP 8.4+, ARFA 1.3.
+
+            ## Installation
+
+            ```bash
+            composer require kariricode/dotenv
+            ```
+
+            ## Quick Start
+
+            ```php
+            use KaririCode\Dotenv\Dotenv;
+            use function KaririCode\Dotenv\env;
+
+            $dotenv = new Dotenv(__DIR__);
+            $dotenv->load();
+
+            // Auto type-cast: string, int, float, bool, null, array
+            $debug = env('APP_DEBUG');  // bool
+            $port  = env('DB_PORT');    // int
+
+            // Fluent validation DSL
+            $dotenv->validate()
+                ->required('APP_KEY', 'DB_HOST')
+                ->isInteger('DB_PORT')->between(1, 65535)
+                ->allowedValues('APP_ENV', ['local', 'staging', 'production'])
+                ->assert();
+            ```
+
+            See [CHANGELOG.md](CHANGELOG.md) for details.
