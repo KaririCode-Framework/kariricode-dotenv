@@ -12,6 +12,13 @@ on:
       - develop
   workflow_dispatch:
 
+# Reusable step to install kcode from the official PHAR release
+# Usage in each job:
+#   - name: Install kcode
+#     run: |
+#       wget -q https://github.com/KaririCode-Framework/kariricode-devkit/releases/latest/download/kcode.phar
+#       chmod +x kcode.phar && sudo mv kcode.phar /usr/local/bin/kcode
+
 jobs:
   # ============================================================================
   # DEPENDENCY VALIDATION
@@ -61,10 +68,10 @@ jobs:
         run: composer audit --format=plain
 
   # ============================================================================
-  # STATIC ANALYSIS — PHPStan (via kcode)
+  # STATIC ANALYSIS — PHPStan + Psalm via kcode analyse
   # ============================================================================
-  phpstan:
-    name: PHPStan Static Analysis
+  analyse:
+    name: Static Analysis (PHPStan + Psalm)
     runs-on: ubuntu-latest
 
     steps:
@@ -80,37 +87,17 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
 
-      - name: Initialize kcode devkit
-        run: vendor/bin/kcode init
-
-      - name: Run PHPStan via kcode
-        run: vendor/bin/kcode analyse --tool=phpstan
-
-  # ============================================================================
-  # STATIC ANALYSIS — Psalm (via kcode)
-  # ============================================================================
-  psalm:
-    name: Psalm Static Analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: mbstring, xml, openssl
-          coverage: none
-          tools: composer:v2
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-scripts
+      - name: Install kcode
+        run: |
+          wget -q https://github.com/KaririCode-Framework/kariricode-devkit/releases/latest/download/kcode.phar
+          chmod +x kcode.phar
+          sudo mv kcode.phar /usr/local/bin/kcode
 
       - name: Initialize kcode devkit
-        run: vendor/bin/kcode init
+        run: kcode init
 
-      - name: Run Psalm via kcode
-        run: vendor/bin/kcode analyse --tool=psalm
+      - name: Run PHPStan + Psalm via kcode
+        run: kcode analyse
 
   # ============================================================================
   # CODE STYLE (PHP CS Fixer via kcode)
@@ -132,11 +119,17 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
 
+      - name: Install kcode
+        run: |
+          wget -q https://github.com/KaririCode-Framework/kariricode-devkit/releases/latest/download/kcode.phar
+          chmod +x kcode.phar
+          sudo mv kcode.phar /usr/local/bin/kcode
+
       - name: Initialize kcode devkit
-        run: vendor/bin/kcode init
+        run: kcode init
 
       - name: Check code style via kcode
-        run: vendor/bin/kcode cs:fix --check
+        run: kcode cs:fix --check
 
   # ============================================================================
   # TESTS WITH COVERAGE
@@ -158,11 +151,17 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
 
+      - name: Install kcode
+        run: |
+          wget -q https://github.com/KaririCode-Framework/kariricode-devkit/releases/latest/download/kcode.phar
+          chmod +x kcode.phar
+          sudo mv kcode.phar /usr/local/bin/kcode
+
       - name: Initialize kcode devkit
-        run: vendor/bin/kcode init
+        run: kcode init
 
       - name: Run tests with coverage
-        run: vendor/bin/kcode test --coverage
+        run: kcode test --coverage
 
   # ============================================================================
   # QUALITY SUMMARY
@@ -170,7 +169,7 @@ jobs:
   quality-summary:
     name: Quality Summary
     runs-on: ubuntu-latest
-    needs: [dependencies, security, phpstan, psalm, cs-fixer, tests]
+    needs: [dependencies, security, analyse, cs-fixer, tests]
     if: always()
 
     steps:
@@ -182,14 +181,12 @@ jobs:
           echo "|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
           echo "| Dependencies | ${{ needs.dependencies.result }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Security | ${{ needs.security.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| PHPStan | ${{ needs.phpstan.result }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Psalm | ${{ needs.psalm.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Static Analysis | ${{ needs.analyse.result }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| CS Fixer | ${{ needs.cs-fixer.result }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Tests | ${{ needs.tests.result }} |" >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${{ needs.security.result }}" != "success" ] || \
-             [ "${{ needs.phpstan.result }}" != "success" ] || \
-             [ "${{ needs.psalm.result }}" != "success" ] || \
+             [ "${{ needs.analyse.result }}" != "success" ] || \
              [ "${{ needs.cs-fixer.result }}" != "success" ] || \
              [ "${{ needs.tests.result }}" != "success" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
