@@ -23,7 +23,7 @@ All functionality — parsing, type detection, casting, validation, encryption, 
 - **Validation:** `filter_var()`, `is_numeric()`, `preg_match()`
 - **CLI:** `$argv`, `fwrite(STDOUT)`, `file_get_contents()`
 
-Development dependencies (PHPUnit, PHPStan, PHP-CS-Fixer) are in `require-dev` only.
+Development tooling (PHPUnit, PHPStan, PHP-CS-Fixer, Rector) is provided externally by the [KaririCode Devkit](https://github.com/KaririCode-Framework/kariricode-devkit) (`kcode.phar`) — a zero-dependency global PHAR that manages all dev tool configurations across the KaririCode ecosystem. The `composer.json` carries `require-dev: {}` — no dev dependencies at all.
 
 ## Consequences
 

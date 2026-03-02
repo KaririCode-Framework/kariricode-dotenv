@@ -5,7 +5,7 @@
 [![PHP 8.4+](https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg)](LICENSE)
 [![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-4F46E5)](https://phpstan.org/)
-[![Tests](https://img.shields.io/badge/Tests-161%20passing-22c55e)](https://kariricode.org)
+[![Tests](https://img.shields.io/badge/Tests-205%20passing-22c55e)](https://kariricode.org)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-22c55e)](composer.json)
 [![ARFA](https://img.shields.io/badge/ARFA-1.3-orange)](https://kariricode.org)
 [![KaririCode Framework](https://img.shields.io/badge/KaririCode-Framework-orange)](https://kariricode.org)
@@ -370,9 +370,9 @@ src/
 
 | Metric | Value |
 |---|---|
-| PHP source files | 36 |
+| PHP source files | 38 |
 | External runtime dependencies | 0 |
-| Test suite | 161 tests · 275 assertions |
+| Test suite | 205 tests · 396 assertions |
 | PHPStan level | 9 |
 | PHP version | 8.4+ |
 | ARFA compliance | 1.3 |
