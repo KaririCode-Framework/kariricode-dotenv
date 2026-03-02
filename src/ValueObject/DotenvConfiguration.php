@@ -132,6 +132,52 @@ final readonly class DotenvConfiguration
         );
     }
 
+    /**
+     * Return a new instance with the given allow-list glob patterns.
+     *
+     * @param  list<string> $patterns  Glob patterns for allowed variable names.
+     * @since  4.0.0
+     */
+    public function withAllowList(array $patterns): self
+    {
+        return new self(
+            loadMode: $this->loadMode,
+            strictNames: $this->strictNames,
+            typeCasting: $this->typeCasting,
+            populateEnv: $this->populateEnv,
+            populateServer: $this->populateServer,
+            usePutenv: $this->usePutenv,
+            encryptionKey: $this->encryptionKey,
+            cachePath: $this->cachePath,
+            allowList: $patterns,
+            denyList: $this->denyList,
+            environmentName: $this->environmentName,
+        );
+    }
+
+    /**
+     * Return a new instance with the given deny-list glob patterns.
+     *
+     * @param  list<string> $patterns  Glob patterns for denied variable names.
+     * @since  4.0.0
+     */
+    public function withDenyList(array $patterns): self
+    {
+        return new self(
+            loadMode: $this->loadMode,
+            strictNames: $this->strictNames,
+            typeCasting: $this->typeCasting,
+            populateEnv: $this->populateEnv,
+            populateServer: $this->populateServer,
+            usePutenv: $this->usePutenv,
+            encryptionKey: $this->encryptionKey,
+            cachePath: $this->cachePath,
+            allowList: $this->allowList,
+            denyList: $patterns,
+            environmentName: $this->environmentName,
+        );
+    }
+
     public function withEnvironmentName(?string $name): self
     {
         return new self(
