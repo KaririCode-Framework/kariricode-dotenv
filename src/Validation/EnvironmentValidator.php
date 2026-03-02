@@ -117,11 +117,14 @@ final class EnvironmentValidator
         return $this->applyRule(new BetweenRule($min, $max), []);
     }
 
+    /**
+     * @param list<string> $allowed Accepted values for this variable.
+     */
     public function allowedValues(string $name, array $allowed): self
     {
         $this->currentTargets = [$name];
 
-        return $this->applyRule(new AllowedValuesRule(array_values($allowed)), []);
+        return $this->applyRule(new AllowedValuesRule($allowed), []);
     }
 
     public function matchesRegex(string $name, string $pattern): self

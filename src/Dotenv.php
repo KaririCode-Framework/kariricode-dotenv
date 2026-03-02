@@ -107,7 +107,9 @@ final class Dotenv
 
         // Initialize encryptor if key provided via config or environment
         $encryptionKey = $this->configuration->encryptionKey
-            ?? $_SERVER['DOTENV_PRIVATE_KEY'] ?? $_ENV['DOTENV_PRIVATE_KEY'] ?? null;
+            ?? (\is_string($_SERVER['DOTENV_PRIVATE_KEY'] ?? null) ? $_SERVER['DOTENV_PRIVATE_KEY'] : null)
+            ?? (\is_string($_ENV['DOTENV_PRIVATE_KEY'] ?? null) ? $_ENV['DOTENV_PRIVATE_KEY'] : null)
+            ?? null;
 
         if ($encryptionKey !== null && $encryptionKey !== '') {
             $this->encryptor = new Encryptor($encryptionKey);
@@ -193,10 +195,10 @@ final class Dotenv
         $this->loadFile($basePath . '.local', required: false);
 
         // Determine environment name
-        $envName = (string) ($environmentName
+        $envName = $environmentName
             ?? $this->configuration->environmentName
             ?? $this->resolveRawValue('APP_ENV')
-            ?? 'dev');
+            ?? 'dev';
 
         // 3. .env.{env} (committed env-specific defaults)
         $this->loadFile("{$basePath}.{$envName}", required: false);
@@ -243,11 +245,7 @@ final class Dotenv
     public function validate(): EnvironmentValidator
     {
         return new EnvironmentValidator(
-            function (string $name): ?string {
-                $raw = $this->resolveRawValue($name);
-
-                return $raw !== null ? (string) $raw : null;
-            },
+            fn (string $name): ?string => $this->resolveRawValue($name),
         );
     }
 
@@ -550,7 +548,7 @@ final class Dotenv
             return $this->variables[$name]->rawValue;
         }
 
-        $envVal    = $_ENV[$name] ?? null;
+        $envVal = $_ENV[$name] ?? null;
         $serverVal = $_SERVER[$name] ?? null;
 
         if (\is_string($envVal)) {

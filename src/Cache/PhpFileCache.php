@@ -47,7 +47,7 @@ final class PhpFileCache
 
             PHP;
 
-        $tmpFile = $path . '.tmp.' . getmypid();
+        $tmpFile = $path . '.tmp.' . (int) getmypid();
 
         if (file_put_contents($tmpFile, $content) === false) {
             throw new \RuntimeException("Failed to write cache file: {$path}");
@@ -57,7 +57,7 @@ final class PhpFileCache
         rename($tmpFile, $path);
 
         // Invalidate OPcache for this file so the new version is picked up
-        if (function_exists('opcache_invalidate')) {
+        if (\function_exists('opcache_invalidate')) {
             opcache_invalidate($path, true);
         }
     }
@@ -69,19 +69,24 @@ final class PhpFileCache
      */
     public function load(string $path, string $expectedHash = ''): ?array
     {
-        if (!is_file($path) || !is_readable($path)) {
+        if (! is_file($path) || ! is_readable($path)) {
             return null;
         }
 
         $data = include $path;
 
-        if (!is_array($data)) {
+        if (! \is_array($data)) {
             return null;
         }
 
+        /** @var array<string, mixed> $data */
+
         // Validate source hash for staleness detection
         if ($expectedHash !== '') {
-            $storedHash = $data['__metadata']['source_hash'] ?? '';
+            $storedHash = isset($data['__metadata']) && \is_array($data['__metadata'])
+                ? ($data['__metadata']['source_hash'] ?? '')
+                : '';
+
             if ($storedHash !== $expectedHash) {
                 return null;
             }
@@ -90,6 +95,7 @@ final class PhpFileCache
         // Strip metadata before returning
         unset($data['__metadata']);
 
+        /** @var array<string, string> $data */
         return $data;
     }
 
@@ -98,7 +104,7 @@ final class PhpFileCache
         if (is_file($path)) {
             unlink($path);
 
-            if (function_exists('opcache_invalidate')) {
+            if (\function_exists('opcache_invalidate')) {
                 opcache_invalidate($path, true);
             }
         }

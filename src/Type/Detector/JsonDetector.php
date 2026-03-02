@@ -26,7 +26,7 @@ final readonly class JsonDetector implements TypeDetector
     {
         $trimmed = trim($value);
 
-        if (!str_starts_with($trimmed, '{') || !str_ends_with($trimmed, '}')) {
+        if (! str_starts_with($trimmed, '{') || ! str_ends_with($trimmed, '}')) {
             return null;
         }
 

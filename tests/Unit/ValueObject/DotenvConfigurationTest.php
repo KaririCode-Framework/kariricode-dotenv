@@ -136,7 +136,7 @@ final class DotenvConfigurationTest extends TestCase
 
     public function testChainingPreservesAllFields(): void
     {
-        $config = (new DotenvConfiguration())
+        $config = new DotenvConfiguration()
             ->withLoadMode(LoadMode::Overwrite)
             ->withStrictNames(true)
             ->withTypeCasting(false)

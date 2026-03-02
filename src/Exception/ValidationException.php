@@ -20,7 +20,7 @@ final class ValidationException extends DotenvException
     public static function missingRequired(array $missing): self
     {
         return new self(
-            'Missing required environment variables: ' . implode(', ', $missing)
+            'Missing required environment variables: ' . implode(', ', $missing),
         );
     }
 
@@ -28,7 +28,7 @@ final class ValidationException extends DotenvException
     public static function batchErrors(array $errors): self
     {
         $exception = new self(
-            "Environment validation failed:\n- " . implode("\n- ", $errors)
+            "Environment validation failed:\n- " . implode("\n- ", $errors),
         );
         $exception->errors = $errors;
 

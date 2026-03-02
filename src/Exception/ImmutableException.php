@@ -17,7 +17,7 @@ final class ImmutableException extends DotenvException
     public static function alreadyDefined(string $name): self
     {
         return new self(
-            "Environment variable '{$name}' is already defined and cannot be overwritten in Immutable mode."
+            "Environment variable '{$name}' is already defined and cannot be overwritten in Immutable mode.",
         );
     }
 }

@@ -15,7 +15,7 @@ final class ParseException extends DotenvException
     public static function invalidLine(string $line, int $lineNumber, string $filePath): self
     {
         return new self(
-            "Invalid syntax at line {$lineNumber} in {$filePath}: {$line}"
+            "Invalid syntax at line {$lineNumber} in {$filePath}: {$line}",
         );
     }
 
@@ -27,21 +27,21 @@ final class ParseException extends DotenvException
 
         return new self(
             "Invalid variable name '{$name}' at line {$lineNumber} in {$filePath}. "
-            . "Names must match {$pattern}."
+            . "Names must match {$pattern}.",
         );
     }
 
     public static function unterminatedQuote(int $lineNumber, string $filePath): self
     {
         return new self(
-            "Unterminated quoted value at line {$lineNumber} in {$filePath}"
+            "Unterminated quoted value at line {$lineNumber} in {$filePath}",
         );
     }
 
     public static function circularReference(string $variable, string $filePath): self
     {
         return new self(
-            "Circular variable reference detected for '{$variable}' in {$filePath}"
+            "Circular variable reference detected for '{$variable}' in {$filePath}",
         );
     }
 }

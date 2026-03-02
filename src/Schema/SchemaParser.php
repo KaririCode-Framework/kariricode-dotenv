@@ -81,7 +81,7 @@ final class SchemaParser
                     continue;
                 }
 
-                $key   = trim(substr($line, 0, $eqPos));
+                $key = trim(substr($line, 0, $eqPos));
                 $value = trim(substr($line, $eqPos + 1));
                 $schema[$currentSection][$key] = $value;
             }
@@ -150,6 +150,7 @@ final class SchemaParser
         }
     }
 
+    /** @param array<string, string> $directives */
     private function boolDirective(array $directives, string $key): bool
     {
         $value = $directives[$key] ?? 'false';

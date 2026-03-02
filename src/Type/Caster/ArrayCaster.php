@@ -18,6 +18,8 @@ final readonly class ArrayCaster implements TypeCaster
     #[\Override]
     public function cast(string $value): array
     {
-        return json_decode(trim($value), true, 512, JSON_THROW_ON_ERROR);
+        $decoded = json_decode(trim($value), true, 512, JSON_THROW_ON_ERROR);
+
+        return \is_array($decoded) ? array_values($decoded) : [];
     }
 }

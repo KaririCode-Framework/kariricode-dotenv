@@ -33,10 +33,10 @@ final readonly class BooleanDetector implements TypeDetector
     #[\Override]
     public function detect(string $value): ?ValueType
     {
-        if (in_array(strtolower($value), self::BOOLEAN_LITERALS, true)) {
+        if (\in_array(strtolower($value), self::BOOLEAN_LITERALS, true)) {
             return ValueType::Boolean;
         }
 
-        return in_array($value, self::BOOLEAN_PARENTHESIZED, true) ? ValueType::Boolean : null;
+        return \in_array($value, self::BOOLEAN_PARENTHESIZED, true) ? ValueType::Boolean : null;
     }
 }

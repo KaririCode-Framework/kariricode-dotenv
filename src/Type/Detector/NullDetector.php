@@ -30,6 +30,6 @@ final readonly class NullDetector implements TypeDetector
     #[\Override]
     public function detect(string $value): ?ValueType
     {
-        return in_array($value, self::NULL_LITERALS, true) ? ValueType::Null : null;
+        return \in_array($value, self::NULL_LITERALS, true) ? ValueType::Null : null;
     }
 }

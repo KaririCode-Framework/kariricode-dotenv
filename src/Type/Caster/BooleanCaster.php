@@ -17,6 +17,6 @@ final readonly class BooleanCaster implements TypeCaster
     #[\Override]
     public function cast(string $value): bool
     {
-        return in_array(strtolower($value), self::TRUE_VALUES, true);
+        return \in_array(strtolower($value), self::TRUE_VALUES, true);
     }
 }

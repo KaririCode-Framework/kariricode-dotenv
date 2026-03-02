@@ -45,10 +45,12 @@ final class DotenvParser
     {
         /** @var array<string, string> $variables */
         $variables = [];
+        /** @var list<string> $lines */
         $lines = $this->normalizeLines($content);
         $lineNumber = 0;
 
         while ($lineNumber < \count($lines)) {
+            /** @var int<0, max> $lineNumber */
             $line = $lines[$lineNumber];
             // Increment first: $lineNumber becomes 1-indexed (for error messages) and
             // simultaneously equals the 0-indexed position of the next line (for multiline
@@ -99,7 +101,8 @@ final class DotenvParser
     /**
      * Parses the value portion of a KEY=VALUE line.
      *
-     * @param array<string, string> $resolvedVariables Already-parsed variables for interpolation.
+     * @param list<string>            $lines             All source lines.
+     * @param array<string, string>   $resolvedVariables Already-parsed variables for interpolation.
      *
      * @return array{0: string, 1: int} Tuple of [parsed value, additional lines consumed].
      */
@@ -130,6 +133,11 @@ final class DotenvParser
         return [$this->parseUnquoted($rawValue, $resolvedVariables), 0];
     }
 
+    /**
+     * @param list<string>           $lines
+     * @param array<string, string>  $resolvedVariables
+     * @return array{0: string, 1: int}
+     */
     private function parseDoubleQuoted(
         string $rawValue,
         array $lines,
@@ -182,6 +190,7 @@ final class DotenvParser
             }
 
             $result .= "\n";
+            /** @var int<0, max> $nextLineIndex */
             $value = $lines[$nextLineIndex];
             ++$extraLines;
         }
@@ -201,6 +210,7 @@ final class DotenvParser
         return [substr($rawValue, 1, $closingPos - 1), 0];
     }
 
+    /** @param array<string, string> $resolvedVariables */
     private function parseUnquoted(string $rawValue, array $resolvedVariables): string
     {
         // Strip inline comment: look for # preceded by whitespace, outside any quoting
@@ -225,9 +235,9 @@ final class DotenvParser
         $value = preg_replace_callback(
             '/\$\{([A-Za-z_][A-Za-z0-9_]*)(?:(:[-+])(.*?))?\}/',
             static function (array $matches) use ($resolvedVariables): string {
-                $name     = $matches[1];
+                $name = $matches[1];
                 $operator = $matches[2] ?? '';
-                $operand  = $matches[3] ?? '';
+                $operand = $matches[3] ?? '';
 
                 $resolved = $resolvedVariables[$name]
                     ?? (isset($_ENV[$name]) && \is_string($_ENV[$name]) ? $_ENV[$name] : null)

@@ -13,9 +13,9 @@ final class KeyPairTest extends TestCase
     {
         $kp = KeyPair::generate();
 
-        $this->assertSame(64, strlen($kp->privateKey));
+        $this->assertSame(64, \strlen($kp->privateKey));
         $this->assertTrue(ctype_xdigit($kp->privateKey));
-        $this->assertSame(8, strlen($kp->publicId));
+        $this->assertSame(8, \strlen($kp->publicId));
     }
 
     public function testGenerateProducesUniqueKeys(): void

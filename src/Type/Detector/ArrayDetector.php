@@ -26,12 +26,12 @@ final readonly class ArrayDetector implements TypeDetector
     {
         $trimmed = trim($value);
 
-        if (!str_starts_with($trimmed, '[') || !str_ends_with($trimmed, ']')) {
+        if (! str_starts_with($trimmed, '[') || ! str_ends_with($trimmed, ']')) {
             return null;
         }
 
         $decoded = json_decode($trimmed, true);
 
-        return json_last_error() === JSON_ERROR_NONE && is_array($decoded) ? ValueType::Array : null;
+        return json_last_error() === JSON_ERROR_NONE && \is_array($decoded) ? ValueType::Array : null;
     }
 }

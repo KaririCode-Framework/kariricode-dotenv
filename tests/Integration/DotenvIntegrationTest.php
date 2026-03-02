@@ -6,6 +6,9 @@ namespace KaririCode\Dotenv\Tests\Integration;
 
 use KaririCode\Dotenv\Dotenv;
 use KaririCode\Dotenv\Enum\LoadMode;
+
+use function KaririCode\Dotenv\env;
+
 use KaririCode\Dotenv\Exception\FileNotFoundException;
 use KaririCode\Dotenv\Exception\ValidationException;
 use KaririCode\Dotenv\Processor\CsvToArrayProcessor;
@@ -14,8 +17,6 @@ use KaririCode\Dotenv\Security\Encryptor;
 use KaririCode\Dotenv\Security\KeyPair;
 use KaririCode\Dotenv\ValueObject\DotenvConfiguration;
 use PHPUnit\Framework\TestCase;
-
-use function KaririCode\Dotenv\env;
 
 final class DotenvIntegrationTest extends TestCase
 {
@@ -30,7 +31,7 @@ final class DotenvIntegrationTest extends TestCase
     protected function setUp(): void
     {
         $this->fixturesDir = sys_get_temp_dir() . '/kariricode-dotenv-test-' . uniqid();
-        mkdir($this->fixturesDir, 0755, true);
+        mkdir($this->fixturesDir, 0o755, true);
 
         // Snapshot environment to restore in tearDown
         $this->envSnapshot = $_ENV;
@@ -622,7 +623,7 @@ final class DotenvIntegrationTest extends TestCase
 
     private function removeDirectory(string $dir): void
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             return;
         }
 

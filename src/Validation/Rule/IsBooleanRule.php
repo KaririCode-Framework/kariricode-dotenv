@@ -13,7 +13,7 @@ final readonly class IsBooleanRule implements ValidationRule
     #[\Override]
     public function passes(string $value): bool
     {
-        return in_array(strtolower($value), self::ACCEPTED, true);
+        return \in_array(strtolower($value), self::ACCEPTED, true);
     }
 
     #[\Override]
