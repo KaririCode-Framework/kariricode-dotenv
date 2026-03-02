@@ -14,6 +14,7 @@ final readonly class BooleanCaster implements TypeCaster
 {
     private const array TRUE_VALUES = ['true', 'yes', 'on', '(true)'];
 
+    #[\Override]
     public function cast(string $value): bool
     {
         return in_array(strtolower($value), self::TRUE_VALUES, true);

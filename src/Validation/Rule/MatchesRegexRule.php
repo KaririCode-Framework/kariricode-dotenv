@@ -13,11 +13,13 @@ final readonly class MatchesRegexRule implements ValidationRule
     ) {
     }
 
+    #[\Override]
     public function passes(string $value): bool
     {
         return preg_match($this->pattern, $value) === 1;
     }
 
+    #[\Override]
     public function message(): string
     {
         return "{name} must match pattern {$this->pattern}.";

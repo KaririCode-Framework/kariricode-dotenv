@@ -15,6 +15,7 @@ use KaririCode\Dotenv\Contract\TypeCaster;
 final readonly class ArrayCaster implements TypeCaster
 {
     /** @return list<mixed> */
+    #[\Override]
     public function cast(string $value): array
     {
         return json_decode(trim($value), true, 512, JSON_THROW_ON_ERROR);

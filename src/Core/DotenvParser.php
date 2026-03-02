@@ -224,7 +224,12 @@ final class DotenvParser
         // Expand ${VAR:-default} and ${VAR:+alternate} syntax
         $value = preg_replace_callback(
             '/\$\{([A-Za-z_][A-Za-z0-9_]*)(?:(:[-+])(.*?))?\}/',
-            static function (array $matches) use ($resolvedVariables): string {
+            /**
+             * @return scalar|string[]
+             *
+             * @psalm-return non-empty-list<string>|scalar
+             */
+            static function (array $matches) use ($resolvedVariables) {
                 $name = $matches[1];
                 $operator = $matches[2] ?? '';
                 $operand = $matches[3] ?? '';
@@ -249,7 +254,12 @@ final class DotenvParser
         // Expand bare $VAR syntax
         $value = preg_replace_callback(
             '/\$([A-Za-z_][A-Za-z0-9_]*)/',
-            static function (array $matches) use ($resolvedVariables): string {
+            /**
+             * @return scalar|string[]
+             *
+             * @psalm-return non-empty-list<string>|scalar
+             */
+            static function (array $matches) use ($resolvedVariables) {
                 $name = $matches[1];
 
                 return $resolvedVariables[$name]

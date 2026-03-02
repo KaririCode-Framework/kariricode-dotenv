@@ -535,7 +535,12 @@ final class Dotenv
         return $typedValue;
     }
 
-    private function resolveRawValue(string $name): ?string
+    /**
+     * @return null|scalar|string[]
+     *
+     * @psalm-return non-empty-list<string>|null|scalar
+     */
+    private function resolveRawValue(string $name)
     {
         if (isset($this->variables[$name])) {
             return $this->variables[$name]->rawValue;

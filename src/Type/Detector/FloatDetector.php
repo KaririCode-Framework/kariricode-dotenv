@@ -15,11 +15,13 @@ use KaririCode\Dotenv\Enum\ValueType;
  */
 final readonly class FloatDetector implements TypeDetector
 {
+    #[\Override]
     public function priority(): int
     {
         return 170;
     }
 
+    #[\Override]
     public function detect(string $value): ?ValueType
     {
         if ($value === '') {

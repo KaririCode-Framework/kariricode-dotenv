@@ -12,6 +12,7 @@ use KaririCode\Dotenv\Contract\TypeCaster;
  */
 final readonly class NullCaster implements TypeCaster
 {
+    #[\Override]
     public function cast(string $value): null
     {
         return null;

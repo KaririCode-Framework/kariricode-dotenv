@@ -8,11 +8,13 @@ use KaririCode\Dotenv\Contract\ValidationRule;
 
 final readonly class UrlRule implements ValidationRule
 {
+    #[\Override]
     public function passes(string $value): bool
     {
         return filter_var($value, FILTER_VALIDATE_URL) !== false;
     }
 
+    #[\Override]
     public function message(): string
     {
         return '{name} must be a valid URL.';

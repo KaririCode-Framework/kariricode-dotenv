@@ -13,6 +13,7 @@ final readonly class TrimProcessor implements VariableProcessor
     ) {
     }
 
+    #[\Override]
     public function process(string $rawValue, mixed $typedValue): string
     {
         return trim($rawValue, $this->characters);

@@ -14,6 +14,7 @@ final readonly class BetweenRule implements ValidationRule
     ) {
     }
 
+    #[\Override]
     public function passes(string $value): bool
     {
         if (!is_numeric($value)) {
@@ -25,6 +26,7 @@ final readonly class BetweenRule implements ValidationRule
         return $numeric >= $this->min && $numeric <= $this->max;
     }
 
+    #[\Override]
     public function message(): string
     {
         return "{name} must be between {$this->min} and {$this->max}.";

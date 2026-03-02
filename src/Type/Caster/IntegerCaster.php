@@ -12,6 +12,7 @@ use KaririCode\Dotenv\Contract\TypeCaster;
  */
 final readonly class IntegerCaster implements TypeCaster
 {
+    #[\Override]
     public function cast(string $value): int
     {
         return (int) $value;

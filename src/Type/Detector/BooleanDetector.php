@@ -24,11 +24,13 @@ final readonly class BooleanDetector implements TypeDetector
 
     private const array BOOLEAN_PARENTHESIZED = ['(true)', '(false)'];
 
+    #[\Override]
     public function priority(): int
     {
         return 190;
     }
 
+    #[\Override]
     public function detect(string $value): ?ValueType
     {
         if (in_array(strtolower($value), self::BOOLEAN_LITERALS, true)) {

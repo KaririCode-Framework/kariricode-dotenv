@@ -15,11 +15,13 @@ use KaririCode\Dotenv\Enum\ValueType;
  */
 final readonly class JsonDetector implements TypeDetector
 {
+    #[\Override]
     public function priority(): int
     {
         return 160;
     }
 
+    #[\Override]
     public function detect(string $value): ?ValueType
     {
         $trimmed = trim($value);

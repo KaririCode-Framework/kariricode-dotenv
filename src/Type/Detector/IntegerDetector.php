@@ -15,11 +15,13 @@ use KaririCode\Dotenv\Enum\ValueType;
  */
 final readonly class IntegerDetector implements TypeDetector
 {
+    #[\Override]
     public function priority(): int
     {
         return 180;
     }
 
+    #[\Override]
     public function detect(string $value): ?ValueType
     {
         if ($value === '' || $value === '-' || $value === '+') {

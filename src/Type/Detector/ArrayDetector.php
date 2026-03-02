@@ -15,11 +15,13 @@ use KaririCode\Dotenv\Enum\ValueType;
  */
 final readonly class ArrayDetector implements TypeDetector
 {
+    #[\Override]
     public function priority(): int
     {
         return 150;
     }
 
+    #[\Override]
     public function detect(string $value): ?ValueType
     {
         $trimmed = trim($value);

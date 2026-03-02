@@ -8,6 +8,7 @@ use KaririCode\Dotenv\Contract\VariableProcessor;
 
 final readonly class UrlNormalizerProcessor implements VariableProcessor
 {
+    #[\Override]
     public function process(string $rawValue, mixed $typedValue): string
     {
         return rtrim($rawValue, '/') . '/';
