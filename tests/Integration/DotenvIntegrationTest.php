@@ -235,7 +235,8 @@ final class DotenvIntegrationTest extends TestCase
             ADMIN_EMAIL=admin@example.com
             ENV);
 
-        $dotenv = new Dotenv($this->fixturesDir);
+        $config = new DotenvConfiguration(loadMode: LoadMode::Overwrite);
+        $dotenv = new Dotenv($this->fixturesDir, $config);
         $dotenv->load();
 
         $dotenv->validate()
@@ -258,7 +259,8 @@ final class DotenvIntegrationTest extends TestCase
             APP_ENV=wrong
             ENV);
 
-        $dotenv = new Dotenv($this->fixturesDir);
+        $config = new DotenvConfiguration(loadMode: LoadMode::Overwrite);
+        $dotenv = new Dotenv($this->fixturesDir, $config);
         $dotenv->load();
 
         try {
@@ -525,7 +527,8 @@ final class DotenvIntegrationTest extends TestCase
             allowed = local, staging, production
             SCHEMA);
 
-        $dotenv = new Dotenv($this->fixturesDir);
+        $config = new DotenvConfiguration(loadMode: LoadMode::Overwrite);
+        $dotenv = new Dotenv($this->fixturesDir, $config);
         $dotenv->loadWithSchema($schemaPath);
 
         self::assertTrue(true);
@@ -548,7 +551,8 @@ final class DotenvIntegrationTest extends TestCase
             allowed = local, staging, production
             SCHEMA);
 
-        $dotenv = new Dotenv($this->fixturesDir);
+        $config = new DotenvConfiguration(loadMode: LoadMode::Overwrite);
+        $dotenv = new Dotenv($this->fixturesDir, $config);
 
         $this->expectException(ValidationException::class);
 
