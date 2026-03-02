@@ -43,13 +43,13 @@ final class KeyPair
      */
     public static function fromPrivateKey(string $privateKey): self
     {
-        if (strlen($privateKey) !== 64 || !ctype_xdigit($privateKey)) {
+        if (\strlen($privateKey) !== 64 || ! ctype_xdigit($privateKey)) {
             throw new \InvalidArgumentException(
-                'Private key must be a 64-character hex string (256-bit).'
+                'Private key must be a 64-character hex string (256-bit).',
             );
         }
 
-        $publicId = substr(hash('sha256', hex2bin($privateKey)), 0, 8);
+        $publicId = substr(hash('sha256', (string) hex2bin($privateKey)), 0, 8);
 
         return new self($privateKey, $publicId);
     }

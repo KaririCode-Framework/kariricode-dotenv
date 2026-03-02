@@ -20,6 +20,8 @@ final readonly class CsvToArrayProcessor implements VariableProcessor
             return [];
         }
 
-        return array_map(trim(...), explode($this->separator, $rawValue));
+        $separator = $this->separator !== '' ? $this->separator : ',';
+
+        return array_map(trim(...), explode($separator, $rawValue));
     }
 }

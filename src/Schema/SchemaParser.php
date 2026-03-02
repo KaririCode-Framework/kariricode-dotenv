@@ -69,13 +69,19 @@ final class SchemaParser
             if (preg_match('/^\[([A-Za-z_][A-Za-z0-9_]*)\]$/', $line, $matches)) {
                 $currentSection = $matches[1];
                 $schema[$currentSection] ??= [];
+
                 continue;
             }
 
             // Directive: key = value
             if ($currentSection !== null && str_contains($line, '=')) {
                 $eqPos = strpos($line, '=');
-                $key = trim(substr($line, 0, $eqPos));
+
+                if ($eqPos === false) {
+                    continue;
+                }
+
+                $key   = trim(substr($line, 0, $eqPos));
                 $value = trim(substr($line, $eqPos + 1));
                 $schema[$currentSection][$key] = $value;
             }
@@ -118,7 +124,7 @@ final class SchemaParser
                     'url' => $validator->url($variableName),
                     'string' => null, // No additional rule needed
                     default => throw ValidationException::schemaViolation(
-                        "Unknown type '{$type}' for [{$variableName}]."
+                        "Unknown type '{$type}' for [{$variableName}].",
                     ),
                 };
             }
@@ -148,6 +154,6 @@ final class SchemaParser
     {
         $value = $directives[$key] ?? 'false';
 
-        return in_array(strtolower($value), ['true', '1', 'yes', 'on'], true);
+        return \in_array(strtolower($value), ['true', '1', 'yes', 'on'], true);
     }
 }

@@ -38,13 +38,13 @@ final class Encryptor
      */
     public function __construct(string $key)
     {
-        $this->key = strlen($key) === 64 && ctype_xdigit($key)
-            ? hex2bin($key)
+        $this->key = \strlen($key) === 64 && ctype_xdigit($key)
+            ? (string) hex2bin($key)
             : $key;
 
-        if (strlen($this->key) !== 32) {
+        if (\strlen($this->key) !== 32) {
             throw new \InvalidArgumentException(
-                'Encryption key must be 32 bytes (256-bit) or 64-char hex string.'
+                'Encryption key must be 32 bytes (256-bit) or 64-char hex string.',
             );
         }
     }
@@ -66,7 +66,7 @@ final class Encryptor
         );
 
         if ($ciphertext === false) {
-            throw new \RuntimeException('Encryption failed: ' . openssl_error_string());
+            throw new \RuntimeException('Encryption failed: ' . (string) openssl_error_string());
         }
 
         return self::PREFIX . base64_encode($nonce . $ciphertext . $tag);
@@ -74,13 +74,13 @@ final class Encryptor
 
     public function decrypt(string $payload): string
     {
-        if (!self::isEncrypted($payload)) {
+        if (! self::isEncrypted($payload)) {
             return $payload;
         }
 
-        $raw = base64_decode(substr($payload, strlen(self::PREFIX)), true);
+        $raw = base64_decode(substr($payload, \strlen(self::PREFIX)), true);
 
-        if ($raw === false || strlen($raw) < self::NONCE_LENGTH + self::TAG_LENGTH) {
+        if ($raw === false || \strlen($raw) < self::NONCE_LENGTH + self::TAG_LENGTH) {
             throw new \RuntimeException('Invalid encrypted payload: malformed base64 or too short.');
         }
 
@@ -99,7 +99,7 @@ final class Encryptor
 
         if ($plaintext === false) {
             throw new \RuntimeException(
-                'Decryption failed — wrong key or corrupted payload.'
+                'Decryption failed — wrong key or corrupted payload.',
             );
         }
 
