@@ -4,38 +4,22 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Caster;
 
-use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\TypeCaster;
 
-class JsonCaster implements TypeCaster
+/**
+ * Decodes a JSON object string into a PHP associative array.
+ *
+ * Throws JsonException on malformed input rather than returning false/null,
+ * ensuring fail-fast behavior in production.
+ *
+ * @package KaririCode\Dotenv
+ * @since   4.0.0 ARFA 1.3
+ */
+final readonly class JsonCaster implements TypeCaster
 {
-    /**
-     * @throws \JsonException
-     */
-    public function cast(mixed $value): mixed
+    /** @return array<string, mixed> */
+    public function cast(string $value): array
     {
-        if (!is_string($value)) {
-            return $value;
-        }
-
-        $trimmedValue = $this->removeSurroundingQuotes($value);
-
-        return $this->decodeJson($trimmedValue);
-    }
-
-    private function removeSurroundingQuotes(string $value): string
-    {
-        return trim($value, '"\'');
-    }
-
-    /**
-     * @throws \JsonException
-     */
-    private function decodeJson(string $json): mixed
-    {
-        try {
-            return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            return $json;
-        }
+        return json_decode(trim($value), true, 512, JSON_THROW_ON_ERROR);
     }
 }

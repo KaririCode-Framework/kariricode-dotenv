@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Caster;
 
-use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\TypeCaster;
 
-class NullCaster implements TypeCaster
+/**
+ * @package KaririCode\Dotenv
+ * @since   4.0.0 ARFA 1.3
+ */
+final readonly class NullCaster implements TypeCaster
 {
-    public function canCast(mixed $value): bool
-    {
-        return 'null' === $value || '' === $value;
-    }
-
-    public function cast(mixed $value): ?string
+    public function cast(string $value): null
     {
         return null;
     }

@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace KaririCode\Dotenv\Type\Caster;
 
-use KaririCode\Dotenv\Contract\Type\TypeCaster;
+use KaririCode\Dotenv\Contract\TypeCaster;
 
-class BooleanCaster implements TypeCaster
+/**
+ * @package KaririCode\Dotenv
+ * @since   4.0.0 ARFA 1.3
+ */
+final readonly class BooleanCaster implements TypeCaster
 {
-    public function canCast(mixed $value): bool
+    private const array TRUE_VALUES = ['true', 'yes', 'on', '(true)'];
+
+    public function cast(string $value): bool
     {
-        $value = strtolower($value);
-
-        return in_array($value, [
-            'true', 'false', '1', '0', 'yes', 'no', 'on', 'off',
-        ], true);
-    }
-
-    public function cast(mixed $value): bool
-    {
-        $value = strtolower($value);
-
-        return in_array($value, ['true', '1', 'yes', 'on'], true);
+        return in_array(strtolower($value), self::TRUE_VALUES, true);
     }
 }
